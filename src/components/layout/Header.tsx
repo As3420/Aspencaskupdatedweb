@@ -80,25 +80,23 @@ export const Header: React.FC = () => {
   return (
     <motion.header
       className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${
-+        scrolled
-          ? "bg-white/95 backdrop-blur-md shadow-xl border-b border-gray-200"
-          : "bg-transparent"
+        scrolled ? "bg-white/95 backdrop-blur-md shadow-lg" : "bg-transparent"
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="container mx-auto px-6 py-3">
+      <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3" tabIndex={0}>
+          <Link to="/" className="flex items-center space-x-2" tabIndex={0}>
             <img
               src={publicImages.logo}
               alt={`${logoConfig.companyName} Logo`}
-              className="w-12 h-12 rounded-lg shadow-sm border border-gray-200"
+              className="w-10 h-10"
               loading="lazy"
             />
             <span
-              className={`text-2xl font-extrabold bg-gradient-to-r ${logoConfig.colors.text} bg-clip-text text-transparent tracking-tight`}
+              className={`text-xl font-bold bg-gradient-to-r ${logoConfig.colors.text} bg-clip-text text-transparent`}
             >
               {logoConfig.companyName}
             </span>
@@ -106,17 +104,17 @@ export const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav
-            className="hidden md:flex items-center gap-10"
+            className="hidden md:flex items-center space-x-8"
             aria-label="Main navigation"
           >
             {navigationItems.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className={`relative px-4 py-2 font-semibold rounded transition-colors duration-200 ${
+                className={`relative px-3 py-2 font-medium transition-colors duration-300 ${
                   isActive(item.href)
-                    ? "text-blue-700 bg-blue-50 shadow"
-                    : "text-gray-700 hover:text-blue-700 hover:bg-gray-100"
+                    ? "text-blue-600"
+                    : "text-gray-700 hover:text-blue-600"
                 }`}
                 tabIndex={0}
                 aria-current={isActive(item.href) ? "page" : undefined}
@@ -124,7 +122,7 @@ export const Header: React.FC = () => {
                 {item.name}
                 {isActive(item.href) && (
                   <motion.div
-                    className="absolute bottom-0 left-2 right-2 h-1 rounded bg-gradient-to-r from-blue-600 to-purple-600"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600"
                     layoutId="activeTab"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
@@ -135,14 +133,14 @@ export const Header: React.FC = () => {
 
           {/* Mobile Menu Button */}
           <motion.button
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 border border-gray-200 shadow-sm relative z-[110]"
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100 relative z-[110]"
             onClick={() => setIsOpen((prev) => !prev)}
             whileTap={{ scale: 0.95 }}
             aria-label={isOpen ? "Close menu" : "Open menu"}
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
           >
-            {isOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </motion.button>
         </div>
 
@@ -151,19 +149,19 @@ export const Header: React.FC = () => {
           {isOpen && (
             <motion.div
               id="mobile-menu"
-              className="md:hidden fixed inset-0 top-0 bg-gradient-to-br from-white/95 via-blue-50 to-purple-50 backdrop-blur-lg z-[120] shadow-2xl"
-              initial={{ opacity: 0, y: -30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -30 }}
+              className="md:hidden fixed inset-0 top-0 bg-white/95 backdrop-blur-md z-[100]"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "100vh" }}
+              exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
               role="dialog"
               aria-modal="true"
             >
               <nav
-                className="container mx-auto px-6 py-12"
+                className="container mx-auto px-6 py-8"
                 aria-label="Mobile navigation"
               >
-                <div className="space-y-8">
+                <div className="space-y-6">
                   {navigationItems.map((item, index) => (
                     <motion.div
                       key={item.name}
@@ -173,10 +171,10 @@ export const Header: React.FC = () => {
                     >
                       <Link
                         to={item.href}
-                        className={`block px-6 py-4 text-xl font-semibold rounded-xl transition-all duration-200 ${
+                        className={`block px-4 py-3 text-lg font-medium rounded-lg transition-all duration-300 ${
                           isActive(item.href)
-                            ? "text-blue-700 bg-blue-100 shadow"
-                            : "text-gray-700 hover:text-blue-700 hover:bg-gray-100"
+                            ? "text-blue-600 bg-blue-50"
+                            : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
                         }`}
                         onClick={() => setIsOpen(false)}
                         tabIndex={0}
