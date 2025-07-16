@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -20,6 +20,11 @@ export const Footer: React.FC = () => {
   const LogoIcon = Icons[
     logoConfig.icon as keyof typeof Icons
   ] as React.ComponentType<{ className?: string }>;
+
+  // Scroll to top handler
+  const handleNavClick = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   return (
     <footer className="bg-gradient-to-r from-slate-900 to-slate-800 text-white">
@@ -90,6 +95,7 @@ export const Footer: React.FC = () => {
                         item.toLowerCase() === "home" ? "" : item.toLowerCase()
                       }`}
                       className="text-gray-300 hover:text-white transition-colors"
+                      onClick={handleNavClick}
                     >
                       {item}
                     </Link>
@@ -118,6 +124,7 @@ export const Footer: React.FC = () => {
                   <Link
                     to="/services"
                     className="text-gray-300 hover:text-white transition-colors"
+                    onClick={handleNavClick}
                   >
                     {service}
                   </Link>

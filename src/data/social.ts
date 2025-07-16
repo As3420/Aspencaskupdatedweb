@@ -14,7 +14,7 @@ export const socialLinks: SocialLink[] = [
   },
   {
     name: 'Twitter',
-    url: 'https://twitter.com/aspencask',
+    url: 'https://x.com/aspencask?t=R8tw7beSAMlK1lcerdWGHA&s=08',
     icon: 'Twitter',
     color: 'hover:text-blue-400'
   },
@@ -26,13 +26,13 @@ export const socialLinks: SocialLink[] = [
   },
   {
     name: 'Instagram',
-    url: 'https://instagram.com/aspencask.solution',
+    url: 'https://www.instagram.com/aspencask?utm_source=qr&igsh=N3UyeHBqZjBmaDM2',
     icon: 'Instagram',
     color: 'hover:text-pink-600'
   },
   {
     name: 'Facebook',
-    url: 'https://facebook.com/aspencask.solution',
+    url: 'https://www.facebook.com/share/1Akdv3pY1d/',
     icon: 'Facebook',
     color: 'hover:text-blue-700'
   }

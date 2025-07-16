@@ -6,6 +6,7 @@ import { Button } from '../components/ui/Button';
 import { testimonials } from '../data/testimonials';
 import { Star, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import {publicImages} from '../shared/utlis/public-images.utlis';
 
 export const Testimonials: React.FC = () => {
   const navigate = useNavigate();
@@ -128,13 +129,13 @@ export const Testimonials: React.FC = () => {
             
             <div className="flex items-center justify-center">
               <img
-                src="https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2"
+                src= {publicImages.gurmeet}
                 alt="Featured client"
                 className="w-16 h-16 rounded-full object-cover mr-4"
               />
               <div className="text-left">
-                <div className="font-semibold text-gray-900 text-lg">Sarah Johnson</div>
-                <div className="text-gray-600">CTO, TechVision Inc.</div>
+                <div className="font-semibold text-gray-900 text-lg">Gurmeet Gandhi</div>
+                <div className="text-gray-600">CEO, OneZup.</div>
               </div>
             </div>
           </motion.div>

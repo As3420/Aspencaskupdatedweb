@@ -3,9 +3,9 @@ import { Testimonial } from "../types";
 export const testimonials: Testimonial[] = [
   {
     id: "1",
-    name: "Sarah Johnson",
+    name: "Sumit Kumar",
     position: "CTO",
-    company: "TechVision Inc.",
+    company: "OneZup.",
     content:
       "AspenCask Solution delivered an exceptional web application that exceeded our expectations. Their attention to detail and technical expertise is unmatched.",
     rating: 5,
@@ -13,9 +13,9 @@ export const testimonials: Testimonial[] = [
   },
   {
     id: "2",
-    name: "Michael Chen",
+    name: "Gurmeet Gandhi",
     position: "CEO",
-    company: "InnovateLab",
+    company: "OneZup",
     content:
       "The AI solution they built transformed our business operations. Professional, innovative, and results-driven - highly recommended!",
     rating: 5,
@@ -23,9 +23,9 @@ export const testimonials: Testimonial[] = [
   },
   {
     id: "3",
-    name: "Emily Rodriguez",
+    name: "Rahul Kumar",
     position: "VP of Engineering",
-    company: "CloudFirst Solutions",
+    company: "OneZup",
     content:
       "Outstanding cloud migration services. They made the complex process seamless and delivered on time with zero downtime.",
     rating: 5,
@@ -33,9 +33,9 @@ export const testimonials: Testimonial[] = [
   },
   {
     id: "4",
-    name: "David Park",
+    name: "Akhil Sharma",
     position: "Product Manager",
-    company: "Enterprise Dynamics",
+    company: "Edunova Skills",
     content:
       "Their enterprise software solution revolutionized our workflow. Exceptional quality, scalability, and ongoing support.",
     rating: 5,
@@ -43,7 +43,7 @@ export const testimonials: Testimonial[] = [
   },
   {
     id: "5",
-    name: "Jennifer Lee",
+    name: "Vaibhav patel",
     position: "Founder",
     company: "StartupHub",
     content:
@@ -55,7 +55,7 @@ export const testimonials: Testimonial[] = [
     id: "6",
     name: "Robert Martinez",
     position: "IT Director",
-    company: "Global Systems Corp",
+    company: "Amentis Nutraceuticals",
     content:
       "Incredible expertise in modern web technologies. They delivered a high-performance solution that scales perfectly with our growth.",
     rating: 5,
