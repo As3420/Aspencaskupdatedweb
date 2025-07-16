@@ -11,13 +11,71 @@ import { socialLinks } from '../data/social';
 import * as Icons from 'lucide-react';
 
 export const Contact: React.FC = () => {
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactForm>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm<ContactForm>({
+    defaultValues: {
+      name: '',
+      email: '',
+      company: '',
+      message: ''
+    }
+  });
 
-  const onSubmit = (data: ContactForm) => {
-    console.log('Form submitted:', data);
-    // Here you would typically send the data to your backend
-    alert('Thank you for your message! We\'ll get back to you soon.');
-    reset();
+  const onSubmit = async (data: ContactForm) => {
+    try {
+      // Set a timeout for the fetch request
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+
+      const response = await fetch(
+  '/api/contact',
+  {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: data.name,
+      email: data.email,
+      company: data.company || '',
+      message: data.message
+    }),
+    signal: controller.signal,
+    mode: 'cors'
+  }
+);
+
+      console.log('Response status:', response.status);
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const responseData = await response.json();
+        alert('Thank you! Your message was sent successfully.');
+        reset();
+      } else {
+        const errorText = await response.text();
+        console.error('Server error:', response.status, errorText);
+        alert(`Something went wrong. Server responded with: ${response.status} - ${errorText.substring(0, 100)}...`);
+      }
+    } catch (error: any) {
+      console.error('Submission error:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+        url: 'https://script.google.com/macros/s/AKfycbxVYV5Uc4E1BUF3xcUEAr1yumkyLw2UYf8OFe9Eb1aJNhLeuOqZA_fZxj1VwIBidRqf/exec'
+      });
+      if (error.name === 'AbortError') {
+        alert('Request timed out. Please try again later.');
+      } else if (error.message.includes('CORS') || error.message.includes('cors')) {
+        alert('CORS issue detected. The server may not allow cross-origin requests from this origin. Please contact the administrator or try again later.');
+      } else {
+        alert(`Network error: ${error.message}. Please check the server configuration or try again later.`);
+      }
+    }
   };
 
   const contactInfoCards = [
@@ -86,7 +144,7 @@ export const Contact: React.FC = () => {
             >
               <Card className="p-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -111,7 +169,7 @@ export const Contact: React.FC = () => {
                       <input
                         type="email"
                         id="email"
-                        {...register('email', { 
+                        {...register('email', {
                           required: 'Email is required',
                           pattern: {
                             value: /^\S+@\S+$/i,
@@ -157,14 +215,14 @@ export const Contact: React.FC = () => {
                   </div>
 
                   <Button
-                    type="submit"
+                    onClick={handleSubmit(onSubmit)}
                     size="lg"
                     icon={Send}
                     className="w-full"
                   >
                     Send Message
                   </Button>
-                </form>
+                </div>
               </Card>
             </motion.div>
 
@@ -205,7 +263,7 @@ export const Contact: React.FC = () => {
                   </motion.div>
                 ))}
               </div>
-              
+
               {/* Social Links */}
               <div className="mt-6 pt-6 border-t border-gray-200">
                 <h4 className="text-lg font-semibold text-gray-900 mb-4">Follow Us</h4>
