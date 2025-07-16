@@ -1,14 +1,25 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Code, Mail, Phone, MapPin, Linkedin, Twitter, Github } from 'lucide-react';
-import { contactInfo } from '../../data/contact';
-import { socialLinks } from '../../data/social';
-import { logoConfig } from '../../data/logo';
-import * as Icons from 'lucide-react';
+import React from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  Code,
+  Mail,
+  Phone,
+  MapPin,
+  Linkedin,
+  Twitter,
+  Github,
+} from "lucide-react";
+import { contactInfo } from "../../data/contact";
+import { socialLinks } from "../../data/social";
+import { logoConfig } from "../../data/logo";
+import * as Icons from "lucide-react";
+import { publicImages } from "../../shared/utlis";
 
 export const Footer: React.FC = () => {
-  const LogoIcon = Icons[logoConfig.icon as keyof typeof Icons] as React.ComponentType<{ className?: string }>;
+  const LogoIcon = Icons[
+    logoConfig.icon as keyof typeof Icons
+  ] as React.ComponentType<{ className?: string }>;
 
   return (
     <footer className="bg-gradient-to-r from-slate-900 to-slate-800 text-white">
@@ -22,17 +33,28 @@ export const Footer: React.FC = () => {
             viewport={{ once: true }}
           >
             <div className="flex items-center space-x-2 mb-4">
-              <div className={`bg-gradient-to-r ${logoConfig.colors.primary} p-2 rounded-lg`}>
-                <LogoIcon className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-xl font-bold">{logoConfig.companyName}</span>
+              <Link to={"/"} className="flex items-center space-x-2">
+                <img
+                  src={publicImages.logo}
+                  alt="Aspencask Logo"
+                  className="w-10 h-10"
+                />
+                <span
+                  className={`text-xl font-bold bg-gradient-to-r ${logoConfig.colors.text} bg-clip-text text-transparent`}
+                >
+                  {logoConfig.companyName}
+                </span>
+              </Link>
             </div>
             <p className="text-gray-300 mb-4">
-              Leading software development company providing cutting-edge digital solutions since 2024.
+              Leading software development company providing cutting-edge
+              digital solutions since 2024.
             </p>
             <div className="flex space-x-4">
               {socialLinks.slice(0, 3).map((social) => {
-                const SocialIcon = Icons[social.icon as keyof typeof Icons] as React.ComponentType<{ className?: string }>;
+                const SocialIcon = Icons[
+                  social.icon as keyof typeof Icons
+                ] as React.ComponentType<{ className?: string }>;
                 return (
                   <motion.a
                     key={social.name}
@@ -60,16 +82,20 @@ export const Footer: React.FC = () => {
           >
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              {['Home', 'About', 'Services', 'Portfolio', 'Careers'].map((item) => (
-                <li key={item}>
-                  <Link
-                    to={`/${item.toLowerCase() === 'home' ? '' : item.toLowerCase()}`}
-                    className="text-gray-300 hover:text-white transition-colors"
-                  >
-                    {item}
-                  </Link>
-                </li>
-              ))}
+              {["Home", "About", "Services", "Portfolio", "Careers"].map(
+                (item) => (
+                  <li key={item}>
+                    <Link
+                      to={`/${
+                        item.toLowerCase() === "home" ? "" : item.toLowerCase()
+                      }`}
+                      className="text-gray-300 hover:text-white transition-colors"
+                    >
+                      {item}
+                    </Link>
+                  </li>
+                )
+              )}
             </ul>
           </motion.div>
 
@@ -82,7 +108,12 @@ export const Footer: React.FC = () => {
           >
             <h3 className="text-lg font-semibold mb-4">Services</h3>
             <ul className="space-y-2">
-              {['Web Development', 'AI Solutions', 'Cloud Computing', 'Enterprise Software'].map((service) => (
+              {[
+                "Web Development",
+                "AI Solutions",
+                "Cloud Computing",
+                "Enterprise Software",
+              ].map((service) => (
                 <li key={service}>
                   <Link
                     to="/services"
@@ -114,7 +145,9 @@ export const Footer: React.FC = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <MapPin className="w-4 h-4 text-blue-400" />
-                <span className="text-gray-300">{contactInfo.office.city}, {contactInfo.office.state}</span>
+                <span className="text-gray-300">
+                  {contactInfo.office.city}, {contactInfo.office.state}
+                </span>
               </div>
             </div>
           </motion.div>

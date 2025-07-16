@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Code } from 'lucide-react';
-import { navigationItems } from '../../data/navigation';
-import { logoConfig } from '../../data/logo';
-import * as Icons from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X } from "lucide-react";
+import { navigationItems } from "../../data/navigation";
+import { logoConfig } from "../../data/logo";
+import * as Icons from "lucide-react";
+import { publicImages } from "../../shared/utlis";
 
 export const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,39 +16,41 @@ export const Header: React.FC = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
-    
+
     const handleResize = () => {
       if (window.innerWidth >= 768) {
         setIsOpen(false);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleResize);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
-    
+
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 
-  const LogoIcon = Icons[logoConfig.icon as keyof typeof Icons] as React.ComponentType<{ className?: string }>;
+  const LogoIcon = Icons[
+    logoConfig.icon as keyof typeof Icons
+  ] as React.ComponentType<{ className?: string }>;
 
   return (
     <motion.header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
+        scrolled ? "bg-white/95 backdrop-blur-md shadow-lg" : "bg-transparent"
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -56,14 +59,15 @@ export const Header: React.FC = () => {
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
-            <motion.div
-              className={`bg-gradient-to-r ${logoConfig.colors.primary} p-2 rounded-lg`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <img
+              src={publicImages.logo}
+              alt="Aspencask Logo"
+              className="w-10 h-10"
+            />
+
+            <span
+              className={`text-xl font-bold bg-gradient-to-r ${logoConfig.colors.text} bg-clip-text text-transparent`}
             >
-              <LogoIcon className="w-6 h-6 text-white" />
-            </motion.div>
-            <span className={`text-xl font-bold bg-gradient-to-r ${logoConfig.colors.text} bg-clip-text text-transparent`}>
               {logoConfig.companyName}
             </span>
           </Link>
@@ -76,8 +80,8 @@ export const Header: React.FC = () => {
                 to={item.href}
                 className={`relative px-3 py-2 font-medium transition-colors duration-300 ${
                   location.pathname === item.href
-                    ? 'text-blue-600'
-                    : 'text-gray-700 hover:text-blue-600'
+                    ? "text-blue-600"
+                    : "text-gray-700 hover:text-blue-600"
                 }`}
               >
                 {item.name}
@@ -108,7 +112,7 @@ export const Header: React.FC = () => {
             <motion.div
               className="md:hidden fixed inset-0 top-20 bg-white/95 backdrop-blur-md z-40"
               initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
             >
@@ -125,8 +129,8 @@ export const Header: React.FC = () => {
                         to={item.href}
                         className={`block px-4 py-3 text-lg font-medium rounded-lg transition-all duration-300 ${
                           location.pathname === item.href
-                            ? 'text-blue-600 bg-blue-50'
-                            : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                            ? "text-blue-600 bg-blue-50"
+                            : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
                         }`}
                         onClick={() => setIsOpen(false)}
                       >

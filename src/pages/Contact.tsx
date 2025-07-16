@@ -1,79 +1,97 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { useForm } from 'react-hook-form';
-import { AnimatedText } from '../components/ui/AnimatedText';
-import { Card } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { ContactForm } from '../types';
-import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
-import { contactInfo } from '../data/contact';
-import { socialLinks } from '../data/social';
-import * as Icons from 'lucide-react';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { useForm } from "react-hook-form";
+import { AnimatedText } from "../components/ui/AnimatedText";
+import { Card } from "../components/ui/Card";
+import { Button } from "../components/ui/Button";
+import { Snackbar } from "../components/ui/Snackbar";
+import { ContactForm } from "../types";
+import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
+import { contactInfo } from "../data/contact";
+import { socialLinks } from "../data/social";
+import * as Icons from "lucide-react";
 
 export const Contact: React.FC = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
   } = useForm<ContactForm>({
     defaultValues: {
-      name: '',
-      email: '',
-      company: '',
-      message: ''
-    }
+      name: "",
+      email: "",
+      company: "",
+      message: "",
+    },
   });
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (data: ContactForm) => {
     try {
+      setLoading(true);
       // Set a timeout for the fetch request
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
 
-      const response = await fetch(
-  '/api/contact',
-  {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      name: data.name,
-      email: data.email,
-      company: data.company || '',
-      message: data.message
-    }),
-    signal: controller.signal,
-    mode: 'cors'
-  }
-);
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          company: data.company || "",
+          message: data.message,
+        }),
+        signal: controller.signal,
+        mode: "cors",
+      });
+      setLoading(false);
 
-      console.log('Response status:', response.status);
+      console.log("Response status:", response.status);
       clearTimeout(timeoutId);
 
       if (response.ok) {
-        const responseData = await response.json();
-        alert('Thank you! Your message was sent successfully.');
+        await response.json();
         reset();
+        setOpen(true);
       } else {
         const errorText = await response.text();
-        console.error('Server error:', response.status, errorText);
-        alert(`Something went wrong. Server responded with: ${response.status} - ${errorText.substring(0, 100)}...`);
+        console.error("Server error:", response.status, errorText);
+        alert(
+          `Something went wrong. Server responded with: ${
+            response.status
+          } - ${errorText.substring(0, 100)}...`
+        );
       }
-    } catch (error: any) {
-      console.error('Submission error:', {
-        message: error.message,
-        name: error.name,
-        stack: error.stack,
-        url: 'https://script.google.com/macros/s/AKfycbxVYV5Uc4E1BUF3xcUEAr1yumkyLw2UYf8OFe9Eb1aJNhLeuOqZA_fZxj1VwIBidRqf/exec'
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      const errorName = error instanceof Error ? error.name : "Unknown";
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      console.error("Submission error:", {
+        message: errorMessage,
+        name: errorName,
+        stack: errorStack,
+        url: "https://script.google.com/macros/s/AKfycbxVYV5Uc4E1BUF3xcUEAr1yumkyLw2UYf8OFe9Eb1aJNhLeuOqZA_fZxj1VwIBidRqf/exec",
       });
-      if (error.name === 'AbortError') {
-        alert('Request timed out. Please try again later.');
-      } else if (error.message.includes('CORS') || error.message.includes('cors')) {
-        alert('CORS issue detected. The server may not allow cross-origin requests from this origin. Please contact the administrator or try again later.');
+
+      if (errorName === "AbortError") {
+        alert("Request timed out. Please try again later.");
+      } else if (
+        errorMessage.includes("CORS") ||
+        errorMessage.includes("cors")
+      ) {
+        alert(
+          "CORS issue detected. The server may not allow cross-origin requests from this origin. Please contact the administrator or try again later."
+        );
       } else {
-        alert(`Network error: ${error.message}. Please check the server configuration or try again later.`);
+        alert(
+          `Network error: ${errorMessage}. Please check the server configuration or try again later.`
+        );
       }
     }
   };
@@ -81,32 +99,41 @@ export const Contact: React.FC = () => {
   const contactInfoCards = [
     {
       icon: Mail,
-      title: 'Email Us',
+      title: "Email Us",
       details: contactInfo.email,
-      subtitle: 'We reply within 24 hours'
+      subtitle: "We reply within 24 hours",
     },
     {
       icon: Phone,
-      title: 'Call Us',
+      title: "Call Us",
       details: contactInfo.phone,
-      subtitle: contactInfo.businessHours
+      subtitle: contactInfo.businessHours,
     },
     {
       icon: MapPin,
-      title: 'Visit Us',
+      title: "Visit Us",
       details: `${contactInfo.office.address}, ${contactInfo.office.city}`,
-      subtitle: 'Schedule an appointment'
+      subtitle: "Schedule an appointment",
     },
     {
       icon: Clock,
-      title: 'Business Hours',
+      title: "Business Hours",
       details: contactInfo.businessHours,
-      subtitle: contactInfo.supportHours
-    }
+      subtitle: contactInfo.supportHours,
+    },
   ];
+
+  const [open, setOpen] = useState(false);
 
   return (
     <div>
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={() => setOpen(false)}
+        message="Thank you! Your message was sent successfully."
+        type="success"
+      />
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
         <div className="container mx-auto px-6">
@@ -126,7 +153,9 @@ export const Contact: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              Ready to transform your business with cutting-edge technology? Let's discuss your project and explore how we can help you achieve your goals.
+              Ready to transform your business with cutting-edge technology?
+              Let's discuss your project and explore how we can help you achieve
+              your goals.
             </motion.p>
           </motion.div>
         </div>
@@ -143,74 +172,96 @@ export const Contact: React.FC = () => {
               transition={{ duration: 0.5 }}
             >
               <Card className="p-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-6">
+                  Send Us a Message
+                </h2>
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="name"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         Full Name *
                       </label>
                       <input
                         type="text"
                         id="name"
-                        {...register('name', { required: 'Name is required' })}
+                        {...register("name", { required: "Name is required" })}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                         placeholder="Your full name"
                       />
                       {errors.name && (
-                        <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.name.message}
+                        </p>
                       )}
                     </div>
 
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
                         Email Address *
                       </label>
                       <input
                         type="email"
                         id="email"
-                        {...register('email', {
-                          required: 'Email is required',
+                        {...register("email", {
+                          required: "Email is required",
                           pattern: {
                             value: /^\S+@\S+$/i,
-                            message: 'Please enter a valid email'
-                          }
+                            message: "Please enter a valid email",
+                          },
                         })}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                         placeholder="your@email.com"
                       />
                       {errors.email && (
-                        <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.email.message}
+                        </p>
                       )}
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="company"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Company Name
                     </label>
                     <input
                       type="text"
                       id="company"
-                      {...register('company')}
+                      {...register("company")}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                       placeholder="Your company name"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="message"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Message *
                     </label>
                     <textarea
                       id="message"
                       rows={6}
-                      {...register('message', { required: 'Message is required' })}
+                      {...register("message", {
+                        required: "Message is required",
+                      })}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none"
                       placeholder="Tell us about your project..."
                     />
                     {errors.message && (
-                      <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.message.message}
+                      </p>
                     )}
                   </div>
 
@@ -219,8 +270,9 @@ export const Contact: React.FC = () => {
                     size="lg"
                     icon={Send}
                     className="w-full"
+                    disabled={loading}
                   >
-                    Send Message
+                    {loading ? "Sending..." : "Send Message"}
                   </Button>
                 </div>
               </Card>
@@ -234,9 +286,13 @@ export const Contact: React.FC = () => {
               className="space-y-6"
             >
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-6">Contact Information</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-6">
+                  Contact Information
+                </h2>
                 <p className="text-lg text-gray-600 mb-8">
-                  Get in touch with our team to discuss your project requirements and discover how we can help transform your business.
+                  Get in touch with our team to discuss your project
+                  requirements and discover how we can help transform your
+                  business.
                 </p>
               </div>
 
@@ -252,12 +308,20 @@ export const Contact: React.FC = () => {
                       <motion.div
                         className="bg-gradient-to-r from-blue-500 to-purple-600 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
                         whileHover={{ scale: 1.1, rotate: 5 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 20,
+                        }}
                       >
                         <info.icon className="w-6 h-6 text-white" />
                       </motion.div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{info.title}</h3>
-                      <p className="text-gray-700 font-medium mb-1">{info.details}</p>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                        {info.title}
+                      </h3>
+                      <p className="text-gray-700 font-medium mb-1">
+                        {info.details}
+                      </p>
                       <p className="text-sm text-gray-500">{info.subtitle}</p>
                     </Card>
                   </motion.div>
@@ -266,10 +330,14 @@ export const Contact: React.FC = () => {
 
               {/* Social Links */}
               <div className="mt-6 pt-6 border-t border-gray-200">
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">Follow Us</h4>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                  Follow Us
+                </h4>
                 <div className="flex space-x-4">
                   {socialLinks.map((social) => {
-                    const SocialIcon = Icons[social.icon as keyof typeof Icons] as React.ComponentType<{ className?: string }>;
+                    const SocialIcon = Icons[
+                      social.icon as keyof typeof Icons
+                    ] as React.ComponentType<{ className?: string }>;
                     return (
                       <motion.a
                         key={social.name}
@@ -290,14 +358,16 @@ export const Contact: React.FC = () => {
 
               {/* Additional Info */}
               <Card className="p-8 bg-gradient-to-br from-blue-50 to-purple-50 border-0">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Why Work With Us?</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  Why Work With Us?
+                </h3>
                 <ul className="space-y-3">
                   {[
-                    'Free initial consultation and project assessment',
-                    'Transparent pricing with no hidden costs',
-                    'Agile development process with regular updates',
-                    'Dedicated project manager for your account',
-                    'Post-launch support and maintenance included'
+                    "Free initial consultation and project assessment",
+                    "Transparent pricing with no hidden costs",
+                    "Agile development process with regular updates",
+                    "Dedicated project manager for your account",
+                    "Post-launch support and maintenance included",
                   ].map((item, index) => (
                     <motion.li
                       key={index}
@@ -340,20 +410,24 @@ export const Contact: React.FC = () => {
             {[
               {
                 question: "What is your typical project timeline?",
-                answer: "Project timelines vary based on complexity and requirements. Simple websites take 2-4 weeks, while complex enterprise applications can take 3-6 months. We provide detailed timelines during our initial consultation."
+                answer:
+                  "Project timelines vary based on complexity and requirements. Simple websites take 2-4 weeks, while complex enterprise applications can take 3-6 months. We provide detailed timelines during our initial consultation.",
               },
               {
                 question: "Do you provide ongoing support and maintenance?",
-                answer: "Yes, we offer comprehensive support and maintenance packages. This includes regular updates, security patches, performance monitoring, and technical support to ensure your solution continues to perform optimally."
+                answer:
+                  "Yes, we offer comprehensive support and maintenance packages. This includes regular updates, security patches, performance monitoring, and technical support to ensure your solution continues to perform optimally.",
               },
               {
                 question: "What technologies do you specialize in?",
-                answer: "We specialize in modern web technologies including React, Node.js, Python, cloud platforms (AWS, Azure), AI/ML frameworks, and enterprise technologies like Java and .NET. We choose the best tech stack for each project."
+                answer:
+                  "We specialize in modern web technologies including React, Node.js, Python, cloud platforms (AWS, Azure), AI/ML frameworks, and enterprise technologies like Java and .NET. We choose the best tech stack for each project.",
               },
               {
                 question: "How do you ensure project quality?",
-                answer: "We follow rigorous quality assurance processes including code reviews, automated testing, user acceptance testing, and continuous integration. Our agile methodology ensures regular feedback and iterations."
-              }
+                answer:
+                  "We follow rigorous quality assurance processes including code reviews, automated testing, user acceptance testing, and continuous integration. Our agile methodology ensures regular feedback and iterations.",
+              },
             ].map((faq, index) => (
               <motion.div
                 key={index}
@@ -363,7 +437,9 @@ export const Contact: React.FC = () => {
                 viewport={{ once: true }}
               >
                 <Card className="p-8">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{faq.question}</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                    {faq.question}
+                  </h3>
                   <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
                 </Card>
               </motion.div>
