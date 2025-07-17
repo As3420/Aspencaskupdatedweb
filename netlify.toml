@@ -1,0 +1,14 @@
+# netlify.toml
+
+# Build settings for your Vite React app
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+# This rule tells Netlify to send any request to "/api/contact"
+# to your new serverless function.
+[[redirects]]
+  from = "/api/contact"
+  to = "/.netlify/functions/contact"
+  status = 200 # This makes it a "rewrite" or proxy

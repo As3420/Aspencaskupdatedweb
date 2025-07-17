@@ -20,7 +20,13 @@ import {
   Award,
   Lightbulb,
   BookOpen,
-  Star
+  Star,
+  Search,
+  Bell,
+  Mail,
+  Calendar,
+  Target,
+  Zap
 } from 'lucide-react';
 import * as Icons from 'lucide-react';
 
@@ -42,6 +48,9 @@ export const Careers: React.FC = () => {
     setApplicationPosition(jobTitle);
     setShowApplication(true);
   };
+
+  // Check if there are any open positions
+  const hasOpenPositions = jobPositions && jobPositions.length > 0;
 
   return (
     <div>
@@ -166,7 +175,7 @@ export const Careers: React.FC = () => {
         </div>
       </section>
 
-      {/* Open Positions */}
+      {/* Open Positions or Empty State */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
           <motion.div
@@ -181,115 +190,265 @@ export const Careers: React.FC = () => {
               className="text-4xl md:text-5xl font-bold text-gray-900 mb-4"
             />
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Explore exciting opportunities to grow your career with us
+              {hasOpenPositions 
+                ? "Explore exciting opportunities to grow your career with us"
+                : "We're always growing and looking for amazing talent"
+              }
             </p>
           </motion.div>
 
-          <div className="space-y-6">
-            {jobPositions.map((job, index) => (
-              <motion.div
-                key={job.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card className="overflow-hidden">
-                  <div className="p-8">
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
-                      <div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{job.title}</h3>
-                        <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                          <div className="flex items-center">
-                            <Briefcase className="w-4 h-4 mr-1" />
-                            {job.department}
-                          </div>
-                          <div className="flex items-center">
-                            <MapPin className="w-4 h-4 mr-1" />
-                            {job.location}
-                          </div>
-                          <div className="flex items-center">
-                            <Clock className="w-4 h-4 mr-1" />
-                            {job.type}
-                          </div>
-                          <div className="flex items-center">
-                            <Users className="w-4 h-4 mr-1" />
-                            {job.experience}
+          {hasOpenPositions ? (
+            <div className="space-y-6">
+              {jobPositions.map((job, index) => (
+                <motion.div
+                  key={job.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <Card className="overflow-hidden">
+                    <div className="p-8">
+                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
+                        <div>
+                          <h3 className="text-2xl font-bold text-gray-900 mb-2">{job.title}</h3>
+                          <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                            <div className="flex items-center">
+                              <Briefcase className="w-4 h-4 mr-1" />
+                              {job.department}
+                            </div>
+                            <div className="flex items-center">
+                              <MapPin className="w-4 h-4 mr-1" />
+                              {job.location}
+                            </div>
+                            <div className="flex items-center">
+                              <Clock className="w-4 h-4 mr-1" />
+                              {job.type}
+                            </div>
+                            <div className="flex items-center">
+                              <Users className="w-4 h-4 mr-1" />
+                              {job.experience}
+                            </div>
                           </div>
                         </div>
+                        <div className="flex gap-3 mt-4 lg:mt-0">
+                          <Button
+                            variant="outline"
+                            onClick={() => setSelectedJob(selectedJob === job.id ? null : job.id)}
+                            icon={selectedJob === job.id ? ChevronUp : ChevronDown}
+                          >
+                            Details
+                          </Button>
+                          <Button
+                            onClick={() => handleApply(job.title)}
+                          >
+                            Apply Now
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex gap-3 mt-4 lg:mt-0">
-                        <Button
-                          variant="outline"
-                          onClick={() => setSelectedJob(selectedJob === job.id ? null : job.id)}
-                          icon={selectedJob === job.id ? ChevronUp : ChevronDown}
-                        >
-                          Details
-                        </Button>
-                        <Button
-                          onClick={() => handleApply(job.title)}
-                        >
-                          Apply Now
-                        </Button>
-                      </div>
+                      
+                      <p className="text-gray-600 leading-relaxed">{job.description}</p>
                     </div>
-                    
-                    <p className="text-gray-600 leading-relaxed">{job.description}</p>
-                  </div>
 
-                  <AnimatePresence>
-                    {selectedJob === job.id && (
+                    <AnimatePresence>
+                      {selectedJob === job.id && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="border-t border-gray-200 bg-gray-50"
+                        >
+                          <div className="p-8 space-y-6">
+                            <div>
+                              <h4 className="text-lg font-semibold text-gray-900 mb-3">Requirements</h4>
+                              <ul className="space-y-2">
+                                {job.requirements.map((req, idx) => (
+                                  <li key={idx} className="flex items-start">
+                                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                                    <span className="text-gray-600">{req}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            <div>
+                              <h4 className="text-lg font-semibold text-gray-900 mb-3">Responsibilities</h4>
+                              <ul className="space-y-2">
+                                {job.responsibilities.map((resp, idx) => (
+                                  <li key={idx} className="flex items-start">
+                                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                                    <span className="text-gray-600">{resp}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            <div>
+                              <h4 className="text-lg font-semibold text-gray-900 mb-3">Benefits</h4>
+                              <ul className="space-y-2">
+                                {job.benefits.map((benefit, idx) => (
+                                  <li key={idx} className="flex items-start">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                                    <span className="text-gray-600">{benefit}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            /* Beautiful Empty State */
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+              className="max-w-4xl mx-auto"
+            >
+              <Card className="p-12 text-center relative overflow-hidden">
+                {/* Background Pattern */}
+                <div className="absolute inset-0 opacity-5">
+                  <div className="absolute top-10 left-10 w-20 h-20 bg-blue-500 rounded-full"></div>
+                  <div className="absolute top-40 right-20 w-16 h-16 bg-purple-500 rounded-full"></div>
+                  <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-pink-500 rounded-full"></div>
+                  <div className="absolute bottom-40 right-1/4 w-24 h-24 bg-indigo-500 rounded-full"></div>
+                </div>
+
+                {/* Main Content */}
+                <div className="relative z-10">
+                  <motion.div
+                    className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full mb-8"
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
+                    viewport={{ once: true }}
+                  >
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Search className="w-12 h-12 text-white" />
+                    </motion.div>
+                  </motion.div>
+
+                  <motion.h3
+                    className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                    viewport={{ once: true }}
+                  >
+                    No Open Positions Right Now
+                  </motion.h3>
+
+                  <motion.p
+                    className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                    viewport={{ once: true }}
+                  >
+                    We're not actively hiring at the moment, but we're always interested in connecting with talented individuals who share our passion for innovation and excellence.
+                  </motion.p>
+
+                  {/* Feature Cards */}
+                  <motion.div
+                    className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.5 }}
+                    viewport={{ once: true }}
+                  >
+                    <div className="flex flex-col items-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
                       <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="border-t border-gray-200 bg-gray-50"
+                        className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4"
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
                       >
-                        <div className="p-8 space-y-6">
-                          <div>
-                            <h4 className="text-lg font-semibold text-gray-900 mb-3">Requirements</h4>
-                            <ul className="space-y-2">
-                              {job.requirements.map((req, idx) => (
-                                <li key={idx} className="flex items-start">
-                                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                                  <span className="text-gray-600">{req}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div>
-                            <h4 className="text-lg font-semibold text-gray-900 mb-3">Responsibilities</h4>
-                            <ul className="space-y-2">
-                              {job.responsibilities.map((resp, idx) => (
-                                <li key={idx} className="flex items-start">
-                                  <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                                  <span className="text-gray-600">{resp}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div>
-                            <h4 className="text-lg font-semibold text-gray-900 mb-3">Benefits</h4>
-                            <ul className="space-y-2">
-                              {job.benefits.map((benefit, idx) => (
-                                <li key={idx} className="flex items-start">
-                                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                                  <span className="text-gray-600">{benefit}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
+                        <Bell className="w-6 h-6 text-white" />
                       </motion.div>
-                    )}
-                  </AnimatePresence>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">Stay Updated</h4>
+                      <p className="text-sm text-gray-600 text-center">
+                        Be the first to know when new opportunities become available
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col items-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
+                      <motion.div
+                        className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-4"
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      >
+                        <Target className="w-6 h-6 text-white" />
+                      </motion.div>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">Perfect Match</h4>
+                      <p className="text-sm text-gray-600 text-center">
+                        We'll consider your profile for roles that align with your skills
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col items-center p-6 bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl">
+                      <motion.div
+                        className="w-12 h-12 bg-pink-500 rounded-lg flex items-center justify-center mb-4"
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      >
+                        <Zap className="w-6 h-6 text-white" />
+                      </motion.div>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">Fast Response</h4>
+                      <p className="text-sm text-gray-600 text-center">
+                        Quick turnaround when the right opportunity arises
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  {/* Call to Action */}
+                  {/* <motion.div
+                    className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.6 }}
+                    viewport={{ once: true }}
+                  >
+                    <Button
+                      onClick={() => {
+                        setApplicationPosition('General Application');
+                        setShowApplication(true);
+                      }}
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8"
+                      icon={Mail}
+                    >
+                      Send Your Resume
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => window.open('mailto:careers@company.com?subject=Career Interest', '_blank')}
+                      icon={Calendar}
+                    >
+                      Subscribe to Updates
+                    </Button>
+                  </motion.div> */}
+
+                  <motion.p
+                    className="text-sm text-gray-500 mt-6"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.7 }}
+                    viewport={{ once: true }}
+                  >
+                    Follow us on social media for the latest company updates and job postings
+                  </motion.p>
+                </div>
+              </Card>
+            </motion.div>
+          )}
         </div>
       </section>
 
@@ -483,7 +642,7 @@ export const Careers: React.FC = () => {
             <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
               We're always looking for talented individuals. Send us your resume and we'll keep you in mind for future opportunities.
             </p>
-            <Button
+            {/* <Button
               size="lg"
               onClick={() => {
                 setApplicationPosition('General Application');
@@ -492,7 +651,7 @@ export const Careers: React.FC = () => {
               className="bg-white text-slate-900 hover:bg-gray-100"
             >
               Send General Application
-            </Button>
+            </Button> */}
           </motion.div>
         </div>
       </section>
