@@ -79,10 +79,11 @@ export const Header: React.FC = () => {
 
   return (
     <motion.header
-      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${
-        scrolled ? "bg-white/95 backdrop-blur-md shadow-lg" : "bg-transparent"
-      }`}
-      initial={{ y: -100 }}
+      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300
+        bg-white/95 backdrop-blur-md
+        ${scrolled ? "shadow-lg" : ""}
+      `}
+      initial={false}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
     >
@@ -96,7 +97,8 @@ export const Header: React.FC = () => {
               loading="lazy"
             />
             <span
-              className={`text-xl font-bold bg-gradient-to-r ${logoConfig.colors.text} bg-clip-text text-transparent`}
+              className={`text-xl md:text-2xl font-serif font-extrabold tracking-wide bg-gradient-to-r ${logoConfig.colors.text} bg-clip-text text-transparent`}
+              style={{ fontFamily: "'Playfair Display', 'Inter', serif" }}
             >
               {logoConfig.companyName}
             </span>

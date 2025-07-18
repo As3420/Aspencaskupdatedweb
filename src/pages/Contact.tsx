@@ -133,6 +133,7 @@ export const Contact: React.FC = () => {
         onClose={() => setOpen(false)}
         message="Thank you! Your message was sent successfully."
         type="success"
+        className="fixed bottom-6 right-6 z-50"
       />
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
