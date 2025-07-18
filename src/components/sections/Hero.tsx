@@ -99,7 +99,7 @@ export const Hero: React.FC = () => {
         >
           {[
             { number: '50+', label: 'Projects Delivered' },
-            { number: '98%', label: 'Client Satisfaction' },
+            { number: '100%', label: 'Client Satisfaction' },
             { number: '24/7', label: 'Support Available' },
             { number: '2024', label: 'Founded' },
           ].map((stat, index) => (

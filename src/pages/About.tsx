@@ -215,9 +215,9 @@ export const About: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
               { number: '50+', label: 'Projects Completed', icon: '🚀' },
-              { number: '25+', label: 'Happy Clients', icon: '😊' },
+              { number: '50+', label: 'Happy Clients', icon: '😊' },
               { number: '4', label: 'Core Services', icon: '⚡' },
-              { number: '98%', label: 'Client Satisfaction', icon: '⭐' },
+              { number: '100%', label: 'Client Satisfaction', icon: '⭐' },
             ].map((stat, index) => (
               <motion.div
                 key={index}

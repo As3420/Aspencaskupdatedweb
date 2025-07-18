@@ -63,7 +63,7 @@ export const Testimonials: React.FC = () => {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="p-8"
             >
-              <div className="text-4xl font-bold text-blue-600 mb-2">98%</div>
+              <div className="text-4xl font-bold text-blue-600 mb-2">100%</div>
               <div className="text-gray-600">Client Satisfaction Rate</div>
             </motion.div>
 
@@ -73,7 +73,7 @@ export const Testimonials: React.FC = () => {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="p-8"
             >
-              <div className="text-4xl font-bold text-purple-600 mb-2">25+</div>
+              <div className="text-4xl font-bold text-purple-600 mb-2">50+</div>
               <div className="text-gray-600">Happy Clients</div>
             </motion.div>
           </div>
