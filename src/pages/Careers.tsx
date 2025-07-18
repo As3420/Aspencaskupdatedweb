@@ -527,13 +527,13 @@ export const Careers: React.FC = () => {
                     >
                       Send Your Resume
                     </Button>
-                    <Button
+                    {/* <Button
                       variant="outline"
                       onClick={() => window.open('mailto:careers@company.com?subject=Career Interest', '_blank')}
                       icon={Calendar}
                     >
                       Subscribe to Updates
-                    </Button>
+                    </Button> */}
                   </motion.div>
 
                   <motion.p
