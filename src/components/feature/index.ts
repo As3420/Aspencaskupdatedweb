@@ -5,3 +5,4 @@ export { TestimonialsPreview } from './home/TestimonialsPreview';
 export { CTASection } from './home/CTASection';
 export { ProcessSection } from './home/ProcessSection';
 export { ClientLogos } from './home/ClientLogos';
+export { NewsletterSignup } from './home/newsletter';

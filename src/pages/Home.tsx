@@ -6,6 +6,7 @@ import {
   FeaturesSection,
   ProcessSection,
   TestimonialsPreview,
+  NewsletterSignup,
   CTASection
 } from '../components/feature';
 
@@ -18,6 +19,7 @@ export const Home: React.FC = () => {
       <FeaturesSection />
       <ProcessSection />
       <TestimonialsPreview />
+      <NewsletterSignup />
       <CTASection />
     </div>
   );
