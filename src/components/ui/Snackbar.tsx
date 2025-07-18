@@ -68,7 +68,7 @@ export const Snackbar: React.FC<SnackbarProps> = ({
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed top-4 right-4 z-50 max-w-sm"
+          className="fixed bottom-6 right-6 z-50 max-w-sm"
           initial={{ opacity: 0, x: 300, scale: 0.8 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
           exit={{ opacity: 0, x: 300, scale: 0.8 }}
@@ -98,4 +98,4 @@ export const Snackbar: React.FC<SnackbarProps> = ({
       )}
     </AnimatePresence>
   );
-}; 
+};

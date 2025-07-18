@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { AnimatedText } from "../components/ui/AnimatedText";
 import { Card } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
-import { Snackbar } from "../components/ui/Snackbar";
+import { Notification } from "../components/ui/Notification";
 import { ContactForm } from "../types";
 import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
 import { contactInfo } from "../data/contact";
@@ -26,6 +26,15 @@ export const Contact: React.FC = () => {
     },
   });
   const [loading, setLoading] = useState(false);
+  const [notification, setNotification] = useState({
+    open: false,
+    message: "",
+    type: "success" as "success" | "error" | "info" | "warning",
+  });
+
+  const showNotification = (message: string, type: "success" | "error" | "info" | "warning" = "success") => {
+    setNotification({ open: true, message, type });
+  };
 
   const onSubmit = async (data: ContactForm) => {
     try {
@@ -56,17 +65,17 @@ export const Contact: React.FC = () => {
       if (response.ok) {
         await response.json();
         reset();
-        setOpen(true);
+        showNotification("🎉 Thank you! Your message was sent successfully. We'll get back to you soon!", "success");
       } else {
         const errorText = await response.text();
         console.error("Server error:", response.status, errorText);
-        alert(
-          `Something went wrong. Server responded with: ${
-            response.status
-          } - ${errorText.substring(0, 100)}...`
+        showNotification(
+          `❌ Something went wrong. Server responded with: ${response.status}. Please try again.`,
+          "error"
         );
       }
     } catch (error: unknown) {
+      setLoading(false);
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error occurred";
       const errorName = error instanceof Error ? error.name : "Unknown";
@@ -76,21 +85,22 @@ export const Contact: React.FC = () => {
         message: errorMessage,
         name: errorName,
         stack: errorStack,
-        url: "https://script.google.com/macros/s/AKfycbxVYV5Uc4E1BUF3xcUEAr1yumkyLw2UYf8OFe9Eb1aJNhLeuOqZA_fZxj1VwIBidRqf/exec",
       });
 
       if (errorName === "AbortError") {
-        alert("Request timed out. Please try again later.");
+        showNotification("⏰ Request timed out. Please try again later.", "warning");
       } else if (
         errorMessage.includes("CORS") ||
         errorMessage.includes("cors")
       ) {
-        alert(
-          "CORS issue detected. The server may not allow cross-origin requests from this origin. Please contact the administrator or try again later."
+        showNotification(
+          "🚫 Network error detected. Please contact the administrator or try again later.",
+          "error"
         );
       } else {
-        alert(
-          `Network error: ${errorMessage}. Please check the server configuration or try again later.`
+        showNotification(
+          `🔧 Network error: ${errorMessage}. Please check your connection and try again.`,
+          "error"
         );
       }
     }
@@ -123,18 +133,16 @@ export const Contact: React.FC = () => {
     },
   ];
 
-  const [open, setOpen] = useState(false);
-
   return (
     <div>
-      <Snackbar
-        open={open}
+      <Notification
+        open={notification.open}
+        message={notification.message}
+        type={notification.type}
         autoHideDuration={6000}
-        onClose={() => setOpen(false)}
-        message="Thank you! Your message was sent successfully."
-        type="success"
-        className="fixed bottom-6 right-6 z-50"
+        onClose={() => setNotification({ ...notification, open: false })}
       />
+      
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
         <div className="container mx-auto px-6">
