@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { AnimatedText } from "../components/ui/AnimatedText";
@@ -128,18 +127,14 @@ export const Contact: React.FC = () => {
 
   return (
     <div>
-      {typeof window !== "undefined" &&
-        createPortal(
-          <Snackbar
-            open={open}
-            autoHideDuration={6000}
-            onClose={() => setOpen(false)}
-            message="Thank you! Your message was sent successfully."
-            type="success"
-            className="fixed bottom-6 right-6 z-[9999]"
-          />,
-          document.getElementById("snackbar-root") as HTMLElement
-        )}
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={() => setOpen(false)}
+        message="Thank you! Your message was sent successfully."
+        type="success"
+        className="fixed bottom-6 right-6 z-50"
+      />
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
         <div className="container mx-auto px-6">

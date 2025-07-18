@@ -14,8 +14,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         {children}
       </main>
       <Footer />
-      {/* Snackbar Portal Container */}
-      <div id="snackbar-root" className="fixed bottom-6 right-6 z-[9999] pointer-events-none" />
     </div>
   );
 };
