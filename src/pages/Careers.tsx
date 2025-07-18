@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Import useEffect
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { AnimatedText } from '../components/ui/AnimatedText';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { jobPositions, companyBenefits, workCulture } from '../data/careers';
-import { CareerApplication } from '../types';
 import { 
   MapPin, 
   Clock, 
@@ -14,13 +12,6 @@ import {
   Send, 
   ChevronDown, 
   ChevronUp,
-  Heart,
-  TrendingUp,
-  Laptop,
-  Award,
-  Lightbulb,
-  BookOpen,
-  Star,
   Search,
   Bell,
   Mail,
@@ -30,18 +21,115 @@ import {
 } from 'lucide-react';
 import * as Icons from 'lucide-react';
 
+// Define the types based on your Google Sheet structure
+interface JobPosition {
+  id: string;
+  title: string;
+  department: string;
+  location: string;
+  type: string;
+  experience: string;
+  description: string;
+  requirements: string[];
+  responsibilities: string[];
+  benefits: string[];
+}
+
+interface CompanyBenefit {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+interface WorkCulture {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+interface CareerApplication {
+  name: string;
+  email: string;
+  phone: string;
+  position: string;
+  experience: string;
+  portfolio?: string;
+  coverLetter: string;
+}
+
+// Dummy data for benefits and culture (you can keep these or fetch from a sheet if preferred)
+const companyBenefits: CompanyBenefit[] = [
+  { icon: "Heart", title: "Comprehensive Health", description: "Robust health, dental, and vision insurance for you and your family." },
+  { icon: "TrendingUp", title: "Career Growth", description: "Opportunities for professional development, workshops, and mentorship." },
+  { icon: "Laptop", title: "Flexible Work", description: "Hybrid work models and flexible hours to support work-life balance." },
+  { icon: "Award", title: "Recognition Programs", description: "Celebrating achievements and contributions through various recognition initiatives." },
+  { icon: "Lightbulb", title: "Innovation Hub", description: "A culture that fosters creativity and encourages new ideas and solutions." },
+  { icon: "BookOpen", title: "Continuous Learning", description: "Access to online courses, certifications, and a library of resources." },
+];
+
+const workCulture: WorkCulture[] = [
+  { icon: "Users", title: "Collaborative Environment", description: "Team-oriented approach where ideas are shared and growth is mutual." },
+  { icon: "Star", title: "Impactful Work", description: "Contribute to projects that make a real difference in the tech landscape." },
+  { icon: "Zap", title: "Dynamic & Agile", description: "Fast-paced environment with adaptive strategies and quick decision-making." },
+  { icon: "Smile", title: "Inclusive Community", description: "A welcoming and diverse workplace where everyone feels valued." },
+];
+
+
 export const Careers: React.FC = () => {
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [showApplication, setShowApplication] = useState(false);
   const [applicationPosition, setApplicationPosition] = useState('');
+  const [jobPositions, setJobPositions] = useState<JobPosition[]>([]); // State to store fetched jobs
+  const [loadingJobs, setLoadingJobs] = useState(true);
+  const [jobFetchError, setJobFetchError] = useState('');
   
   const { register, handleSubmit, formState: { errors }, reset } = useForm<CareerApplication>();
 
-  const onSubmit = (data: CareerApplication) => {
-    console.log('Application submitted:', data);
-    alert('Thank you for your application! We\'ll review it and get back to you soon.');
-    reset();
-    setShowApplication(false);
+  // Fetch job positions on component mount
+  useEffect(() => {
+    const fetchJobPositions = async () => {
+      try {
+        const response = await fetch('/.netlify/functions/get-jobs'); // Your Netlify function endpoint
+        const data = await response.json();
+        if (response.ok) {
+          setJobPositions(data);
+        } else {
+          setJobFetchError(data.error || 'Failed to fetch job positions');
+        }
+      } catch (error) {
+        console.error('Error fetching job positions:', error);
+        setJobFetchError('An error occurred while fetching job positions');
+      } finally {
+        setLoadingJobs(false);
+      }
+    };
+
+    fetchJobPositions();
+  }, []); // Empty dependency array means this runs once on mount
+
+  const onSubmit = async (data: CareerApplication) => {
+    try {
+      const response = await fetch('/.netlify/functions/apply', { // Your Netlify function endpoint
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert('Thank you for your application! We\'ll review it and get back to you soon.');
+        reset();
+        setShowApplication(false);
+      } else {
+        alert(`Failed to submit application: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Application submission error:', error);
+      alert('An error occurred while submitting your application.');
+    }
   };
 
   const handleApply = (jobTitle: string) => {
@@ -49,7 +137,6 @@ export const Careers: React.FC = () => {
     setShowApplication(true);
   };
 
-  // Check if there are any open positions
   const hasOpenPositions = jobPositions && jobPositions.length > 0;
 
   return (
@@ -190,14 +277,27 @@ export const Careers: React.FC = () => {
               className="text-4xl md:text-5xl font-bold text-gray-900 mb-4"
             />
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              {hasOpenPositions 
-                ? "Explore exciting opportunities to grow your career with us"
-                : "We're always growing and looking for amazing talent"
-              }
+              {loadingJobs ? (
+                "Loading available positions..."
+              ) : jobFetchError ? (
+                <span className="text-red-500">{jobFetchError}</span>
+              ) : hasOpenPositions ? (
+                "Explore exciting opportunities to grow your career with us"
+              ) : (
+                "We're always growing and looking for amazing talent"
+              )}
             </p>
           </motion.div>
 
-          {hasOpenPositions ? (
+          {loadingJobs ? (
+            <div className="text-center text-gray-500">
+              <p>Loading job positions...</p> {/* You can add a spinner here */}
+            </div>
+          ) : jobFetchError ? (
+            <div className="text-center text-red-600">
+              <p>{jobFetchError}</p>
+            </div>
+          ) : hasOpenPositions ? (
             <div className="space-y-6">
               {jobPositions.map((job, index) => (
                 <motion.div
@@ -410,7 +510,7 @@ export const Careers: React.FC = () => {
                   </motion.div>
 
                   {/* Call to Action */}
-                  {/* <motion.div
+                  <motion.div
                     className="flex flex-col sm:flex-row gap-4 justify-center items-center"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -434,7 +534,7 @@ export const Careers: React.FC = () => {
                     >
                       Subscribe to Updates
                     </Button>
-                  </motion.div> */}
+                  </motion.div>
 
                   <motion.p
                     className="text-sm text-gray-500 mt-6"
