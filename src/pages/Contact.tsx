@@ -30,11 +30,10 @@ export const Contact: React.FC = () => {
   const onSubmit = async (data: ContactForm) => {
     try {
       setLoading(true);
-      // Set a timeout for the fetch request
-      const controller = new AbortSignal();
+      // Use AbortController instead of AbortSignal
+      const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
 
-      // Update the fetch URL to Netlify Functions endpoint
       const response = await fetch("/.netlify/functions/contact", {
         method: "POST",
         headers: {
