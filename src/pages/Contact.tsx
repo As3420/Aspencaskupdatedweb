@@ -31,10 +31,11 @@ export const Contact: React.FC = () => {
     try {
       setLoading(true);
       // Set a timeout for the fetch request
-      const controller = new AbortController();
+      const controller = new AbortSignal();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
 
-      const response = await fetch("/api/contact", {
+      // Update the fetch URL to Netlify Functions endpoint
+      const response = await fetch("/.netlify/functions/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
