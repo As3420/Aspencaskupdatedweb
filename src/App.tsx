@@ -8,6 +8,7 @@ import { Portfolio } from './pages/Portfolio';
 import { Testimonials } from './pages/Testimonials';
 import { Contact } from './pages/Contact';
 import { Careers } from './pages/Careers';
+import ChatBot from './components/ui/ChatBot'
 
 function App() {
   return (
@@ -23,6 +24,9 @@ function App() {
           <Route path="/careers" element={<Careers />} />
         </Routes>
       </Layout>
+      
+      {/* ChatBot floating in corner - available on all pages */}
+      <ChatBot />
     </Router>
   );
 }
