@@ -30,8 +30,8 @@ What we excel at:
 💡 Technology Consulting - Strategy & digital transformation
 
 Quick Stats:
-✅ 100+ successful projects delivered
-✅ 99.9% client satisfaction rate
+✅ 50+ successful projects delivered
+✅ 100% client satisfaction rate
 ✅ 24/7 support & maintenance
 ✅ 6 months free post-launch support
 

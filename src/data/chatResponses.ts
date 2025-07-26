@@ -13,7 +13,7 @@ ${serviceCategories.map(category =>
 ).join('\n\n')}
 
 💼 Why Choose AspenCask?
-✅ 100+ successful projects delivered
+✅ 50+ successful projects delivered
 ✅ 99.9% client satisfaction rate
 ✅ 24/7 support & maintenance
 ✅ Agile development methodology
@@ -32,7 +32,7 @@ Who We Are:
 Founded in 2024, we're a rapidly growing software development company specializing in cutting-edge technology solutions. Our mission is to transform businesses through innovative digital solutions.
 
 Our Achievements:
-📈 100+ successful projects delivered
+📈 50+ successful projects delivered
 🎯 99.9% client satisfaction rate
 🏆 50+ enterprise clients served
 🌍 Global presence across 15+ countries
@@ -1014,7 +1014,7 @@ Development Methodology:
 Why Choose Our Enterprise Solutions:
 
 ✅ Proven Track Record
-• 100+ enterprise implementations
+• 50+ enterprise implementations
 • 99.9% system uptime
 • 95% client satisfaction rate
 • Zero data loss incidents
