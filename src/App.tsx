@@ -8,7 +8,7 @@ import { Portfolio } from './pages/Portfolio';
 import { Testimonials } from './pages/Testimonials';
 import { Contact } from './pages/Contact';
 import { Careers } from './pages/Careers';
-import ChatBot from './components/ui/ChatBot'
+import ChatBot from './components/ChatBot';
 
 function App() {
   return (
