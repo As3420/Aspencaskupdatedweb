@@ -29,15 +29,15 @@ const ChatBotHeader: React.FC<ChatBotHeaderProps> = ({
           <div className="min-w-0 flex-1">
             <h3 className="font-bold text-sm sm:text-base truncate">
               <span className="hidden sm:inline">AspenCask AI Assistant</span>
-              <span className="sm:hidden">AspenCask AI</span>
+              <span className="sm:hidden">AspenCask AI Assistant</span>
             </h3>
-            {/* <div className="flex items-center space-x-1 sm:space-x-2">
+            <div className="flex items-center space-x-1 sm:space-x-2">
               <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full animate-ping flex-shrink-0"></div>
               <p className="text-xs text-blue-100 truncate">
                 <span className="hidden sm:inline">Online • Instant Response</span>
                 <span className="sm:hidden">Online</span>
               </p>
-            </div> */}
+            </div>
           </div>
         </div>
         

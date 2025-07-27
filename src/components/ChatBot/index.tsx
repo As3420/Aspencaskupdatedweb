@@ -108,51 +108,6 @@ const ChatBot: React.FC = () => {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Chat Statistics */}
-              <div className="px-4 py-2 bg-gray-50 border-t border-gray-100 text-xs text-gray-500">
-                <div className="flex items-center justify-between">
-                  <span>Messages: {messageCount}</span>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => setShowAnalytics(!showAnalytics)}
-                      className="flex items-center space-x-1 hover:text-blue-600 transition-colors"
-                      title="View Analytics"
-                    >
-                      <BarChart3 size={12} />
-                      <span>Analytics</span>
-                    </button>
-                    <button
-                      onClick={exportChatHistory}
-                      className="flex items-center space-x-1 hover:text-blue-600 transition-colors"
-                      title="Export Chat"
-                    >
-                      <Download size={12} />
-                      <span>Export</span>
-                    </button>
-                  </div>
-                </div>
-                
-                {/* Analytics Panel */}
-                {showAnalytics && (
-                  <div className="mt-3 p-3 bg-white rounded-lg border border-gray-200 text-xs">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <span className="font-medium">Sessions:</span> {analytics.totalSessions}
-                      </div>
-                      <div>
-                        <span className="font-medium">Satisfaction:</span> {analytics.satisfactionScore.toFixed(1)}/5
-                      </div>
-                      <div className="col-span-2">
-                        <span className="font-medium">Top Queries:</span>
-                        <div className="text-gray-400 text-xs mt-1">
-                          {analytics.commonQueries.slice(-3).join(', ') || 'No data yet'}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
               {/* Input */}
               <ChatInput
                 inputValue={inputValue}
@@ -204,12 +159,12 @@ const ChatBot: React.FC = () => {
       </button>
 
       {/* Floating tooltip */}
-      {!isOpen && (
+      {/* {!isOpen && (
         <div className="absolute bottom-20 right-0 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap shadow-lg">
           💬 Chat with AspenCask AI
           <div className="absolute top-full right-4 w-2 h-2 bg-gray-900 transform rotate-45"></div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

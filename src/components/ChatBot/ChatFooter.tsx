@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Mail, Shield, Award } from 'lucide-react';
+import { Phone, Mail} from 'lucide-react';
 
 const ChatFooter: React.FC = () => {
   return (
@@ -23,12 +23,12 @@ const ChatFooter: React.FC = () => {
       </div>
 
       {/* Trust indicators */}
-      <div className="flex items-center justify-center space-x-3 text-xs text-gray-500 border-t border-gray-200 pt-2">
+      {/* <div className="flex items-center justify-center space-x-3 text-xs text-gray-500 border-t border-gray-200 pt-2"> */}
         {/* <div className="flex items-center space-x-1">
           <Shield size={10} />
           <span>SOC 2 Certified</span>
         </div> */}
-        <div className="flex items-center space-x-1">
+        {/* <div className="flex items-center space-x-1">
           <Award size={10} />
           <span>50+ Projects</span>
         </div>
@@ -36,12 +36,12 @@ const ChatFooter: React.FC = () => {
           <span className="w-2 h-2 bg-green-400 rounded-full"></span>
           <span>99.9% Uptime</span>
         </div>
-      </div>
+      </div> */}
 
       {/* Powered by */}
-      <div className="text-center mt-2 text-xs text-gray-400">
+      {/* <div className="text-center mt-2 text-xs text-gray-400">
         Powered by AspenCask AI • Response time: ~15 sec
-      </div>
+      </div> */}
     </div>
   );
 };
