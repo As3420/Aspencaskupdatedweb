@@ -7,12 +7,11 @@ import { socialLinks } from './social';
 import { testimonials } from './testimonials';
 import { services } from './services';
 
-// Enhanced founder/owner keyword detection with more comprehensive patterns
+// Enhanced founder/owner keyword detection
 const founderKeywords = [
   'founder', 'owner', 'ceo', 'director', 'established', 'started', 'created', 
   'who made', 'who owns', 'who founded', 'leadership', 'management', 
-  'company head', 'established by', 'who runs', 'boss', 'chief', 'head',
-  'president', 'chairman', 'managing director', 'proprietor', 'co-founder'
+  'company head', 'established by', 'who runs', 'boss', 'chief', 'head'
 ];
 
 const founderPatterns = [
@@ -20,17 +19,14 @@ const founderPatterns = [
   /owner/i,
   /ceo/i,
   /director/i,
-  /who (is|are|owns|founded|created|started|runs|leads|manages)/i,
+  /who (is|are|owns|founded|created|started|runs|leads)/i,
   /established by/i,
   /company head/i,
   /leadership/i,
   /management/i,
   /boss/i,
   /chief/i,
-  /head of/i,
-  /president/i,
-  /chairman/i,
-  /proprietor/i
+  /head of/i
 ];
 
 const containsFounderKeywords = (query: string): boolean => {
@@ -40,48 +36,21 @@ const containsFounderKeywords = (query: string): boolean => {
 };
 
 const getFounderResponse = (): KeywordResponse => ({
-  text: "The founder and owner of AspenCask Solution LLP is **Piyush Ranjan**. Our office is located in **Raj Bagh, Ghaziabad**.\n\n🏢 **About Our Leadership:**\n• Founder & CEO: Piyush Ranjan\n• Extensive experience in technology solutions\n• Committed to delivering innovative digital transformation\n• Leading a team of 50+ expert professionals",
-  options: ["🏢 About Us", "📞 Contact Us", "🌟 Our Services", "💼 Careers"]
+  text: "The founder and owner of AspenCask Solution LLP is Piyush Ranjan. Our office is located in Raj Bagh, Ghaziabad.",
+  options: ["🏢 About Us", "📞 Contact Us"]
 });
 
-// Enhanced service detection with semantic understanding
+// Enhanced service detection
 const serviceKeywords = {
-  'web development': [
-    'web', 'website', 'frontend', 'backend', 'html', 'css', 'javascript', 'react', 'vue', 'angular',
-    'responsive', 'ui', 'user interface', 'landing page', 'portfolio', 'business website', 'e-commerce site'
-  ],
-  'app development': [
-    'mobile', 'app', 'android', 'ios', 'react native', 'flutter', 'application', 'smartphone',
-    'tablet', 'cross-platform', 'native app', 'mobile application', 'play store', 'app store'
-  ],
-  'ai & machine learning': [
-    'ai', 'artificial intelligence', 'machine learning', 'ml', 'deep learning', 'neural network', 
-    'chatbot', 'nlp', 'computer vision', 'predictive analytics', 'automation', 'smart system'
-  ],
-  'cloud computing': [
-    'cloud', 'aws', 'azure', 'google cloud', 'deployment', 'hosting', 'server', 'infrastructure',
-    'scalability', 'cloud migration', 'devops', 'kubernetes', 'docker'
-  ],
-  'blockchain': [
-    'blockchain', 'cryptocurrency', 'smart contract', 'ethereum', 'web3', 'defi', 'nft',
-    'decentralized', 'crypto', 'token', 'dapp'
-  ],
-  'data analytics': [
-    'data', 'analytics', 'business intelligence', 'bi', 'dashboard', 'reporting', 'visualization',
-    'big data', 'data science', 'insights', 'metrics', 'kpi'
-  ],
-  'cybersecurity': [
-    'security', 'cybersecurity', 'penetration testing', 'vulnerability', 'firewall', 'encryption',
-    'secure', 'protection', 'audit', 'compliance'
-  ],
-  'ui/ux design': [
-    'design', 'ui', 'ux', 'user interface', 'user experience', 'prototype', 'wireframe',
-    'graphic design', 'visual design', 'usability', 'branding'
-  ],
-  'enterprise solutions': [
-    'enterprise', 'erp', 'crm', 'business solution', 'automation', 'workflow', 'integration',
-    'custom software', 'business process', 'digital transformation'
-  ]
+  'web development': ['web', 'website', 'frontend', 'backend', 'html', 'css', 'javascript', 'react', 'vue', 'angular'],
+  'app development': ['mobile', 'app', 'android', 'ios', 'react native', 'flutter', 'application'],
+  'ai & machine learning': ['ai', 'artificial intelligence', 'machine learning', 'ml', 'deep learning', 'neural network', 'chatbot'],
+  'cloud computing': ['cloud', 'aws', 'azure', 'google cloud', 'deployment', 'hosting', 'server'],
+  'blockchain': ['blockchain', 'cryptocurrency', 'smart contract', 'ethereum', 'web3', 'defi'],
+  'data analytics': ['data', 'analytics', 'business intelligence', 'bi', 'dashboard', 'reporting'],
+  'cybersecurity': ['security', 'cybersecurity', 'penetration testing', 'vulnerability', 'firewall'],
+  'ui/ux design': ['design', 'ui', 'ux', 'user interface', 'user experience', 'prototype', 'wireframe'],
+  'enterprise solutions': ['enterprise', 'erp', 'crm', 'business solution', 'automation']
 };
 
 const detectServiceFromQuery = (query: string): string | null => {
@@ -95,43 +64,6 @@ const detectServiceFromQuery = (query: string): string | null => {
   return null;
 };
 
-// Enhanced greeting patterns
-const greetingPatterns = [
-  /^(hi|hello|hey|good morning|good afternoon|good evening|greetings)/i,
-  /^(how are you|what's up|how's it going)/i,
-  /^(start|begin|help me)/i
-];
-
-const isGreeting = (message: string): boolean => {
-  return greetingPatterns.some(pattern => pattern.test(message.trim()));
-};
-
-const getGreetingResponse = (): KeywordResponse => ({
-  text: "Hello! 👋 Welcome to **AspenCask Solution LLP** - Your Complete Technology Partner!\n\n🚀 We're here to help transform your business with innovative digital solutions. Whether you need web development, mobile apps, AI solutions, or any other technology service, we've got you covered!\n\n**How can we assist you today?**",
-  options: ["🌟 Our Services", "🏢 About Us", "💰 Get Quote", "📞 Contact Us", "📊 Case Studies"]
-});
-
-// Enhanced question patterns
-const questionPatterns = {
-  pricing: /\b(price|cost|pricing|budget|quote|estimate|fee|charge|rate)\b/i,
-  services: /\b(service|what do you do|what can you|capabilities|offerings)\b/i,
-  contact: /\b(contact|reach|call|email|phone|address|location)\b/i,
-  about: /\b(about|who are you|company|business|team|history)\b/i,
-  process: /\b(process|how do you|methodology|approach|workflow)\b/i,
-  technology: /\b(technology|tech stack|tools|framework|platform)\b/i,
-  portfolio: /\b(portfolio|projects|work|examples|case studies)\b/i,
-  careers: /\b(career|job|hiring|work|employment|vacancy)\b/i
-};
-
-const detectQuestionIntent = (query: string): string | null => {
-  for (const [intent, pattern] of Object.entries(questionPatterns)) {
-    if (pattern.test(query)) {
-      return intent;
-    }
-  }
-  return null;
-};
-
 export const quickOptions: QuickOption[] = [
   {
     text: "🌟 Our Services",
@@ -140,10 +72,10 @@ export const quickOptions: QuickOption[] = [
 We offer comprehensive technology solutions across 9 major categories:
 
 ${serviceCategories.map(category =>
-  `${category.icon} **${category.name}**\n  ${category.description}`
+  `${category.icon} ${category.name}\n  ${category.description}`
 ).join('\n\n')}
 
-💼 **Why Choose AspenCask?**
+💼 Why Choose AspenCask?
 ✅ 50+ successful projects delivered
 ✅ 99.9% client satisfaction rate
 ✅ 24/7 support & maintenance
@@ -151,7 +83,7 @@ ${serviceCategories.map(category =>
 ✅ Transparent pricing with no hidden costs
 ✅ 6 months free post-launch support
 
-**Which technology area interests you most?**`,
+Which technology area interests you most?`,
     options: serviceCategories.map(cat => cat.name).concat(["💰 Get Quote", "📞 Contact Us", "📊 Case Studies"]),
     category: "services"
   },
@@ -159,10 +91,10 @@ ${serviceCategories.map(category =>
     text: "🏢 About Us",
     response: `About AspenCask Solution LLP 🌟
 
-**Who We Are:**
+Who We Are:
 Founded in 2024, we're a rapidly growing software development company specializing in cutting-edge technology solutions. Our mission is to transform businesses through innovative digital solutions.
 
-**Our Achievements:**
+Our Achievements:
 📈 50+ successful projects delivered
 🎯 99.9% client satisfaction rate
 🏆 50+ enterprise clients served
@@ -170,14 +102,14 @@ Founded in 2024, we're a rapidly growing software development company specializi
 ⭐ 4.9/5 average client rating
 💼 $50M+ in client value generated
 
-**Our Expertise:**
+Our Expertise:
 👥 50+ expert developers, designers & consultants
 🔧 Latest technology stack & tools
 📋 ISO 9001:2015 certified processes
 🛡️ SOC 2 Type II compliance
 🎓 Continuous learning & certification programs
 
-**Our Values:**
+Our Values:
 🚀 Innovation-driven solutions
 🤝 Client-centric approach
 💎 Quality & reliability first
@@ -185,8 +117,8 @@ Founded in 2024, we're a rapidly growing software development company specializi
 📚 Continuous improvement
 🌱 Sustainable technology practices
 
-**Leadership Team:**
-• **Founder & CEO:** Piyush Ranjan
+Leadership Team:
+• Founder & CEO: Piyush Ranjan
 • CTO with 15+ years experience
 • Technical leads from top tech companies
 • Domain experts across all verticals
@@ -200,20 +132,20 @@ Ready to transform your business with technology? 🌟`,
     text: "📞 Contact Us",
     response: `Get in Touch with AspenCask Solution LLP 📲
 
-**Direct Contact:**
-📞 **Phone:** ${contactInfo.phone}
-📧 **Email:** ${contactInfo.email}
-🌐 **Website:** www.aspencask.com
-🏢 **Office:** Raj Bagh, Ghaziabad
+Direct Contact:
+📞 Phone: ${contactInfo.phone}
+📧 Email: ${contactInfo.email}
+🌐 Website: www.aspencask.com
+🏢 Office: Raj Bagh, Ghaziabad
 
-**Business Hours (IST):**
+Business Hours (IST):
 🕒 ${contactInfo.businessHours}
 
-**Support Hours:**
+Support Hours:
 🕒 ${contactInfo.supportHours}
 (24/7 Emergency Support Available)
 
-**What to Expect:**
+What to Expect:
 ✅ FREE initial consultation (30 min)
 ✅ Project assessment & recommendations
 ✅ Transparent pricing with detailed breakdown
@@ -221,14 +153,14 @@ Ready to transform your business with technology? 🌟`,
 ✅ Dedicated project manager assigned
 ✅ 24/7 support throughout development
 
-**Response Time Guarantee:**
+Response Time Guarantee:
 • Phone calls: Immediate during business hours
 • Emails: Within 2 hours
 • Chat messages: Within 15 minutes
 • Project quotes: Within 24 hours
 • Discovery calls: Same day scheduling
 
-**Contact Preferences:**
+Contact Preferences:
 • Quick questions → Chat or Phone
 • Detailed discussions → Schedule a call
 • Project inquiries → Email with requirements
@@ -238,28 +170,27 @@ Ready to start your project? We're here to help! 🚀`,
     options: ["📅 Schedule Call", "📧 Send Email", "🌟 Our Services", "💰 Get Quote", "🤝 Social Media"],
     category: "contact"
   },
-  // ... [Rest of the quickOptions array remains the same but with enhanced formatting using ** for bold text] ...
   {
     text: "💰 Get Quote",
     response: `Get Your Custom Project Quote 💼
 
-**Free Quote Process:**
+Free Quote Process:
 1️⃣ Initial Consultation (FREE 30 min)
 2️⃣ Requirement Analysis (Detailed discussion)
 3️⃣ Technical Proposal (Architecture & approach)
 4️⃣ Custom Quote (Transparent pricing)
 5️⃣ Project Planning (Timeline & milestones)
 
-**Information We Need:**
-📋 **Project Type:** Web, Mobile, AI, Cloud, Enterprise
-📊 **Project Scope:** Features, integrations, complexity
-⏰ **Timeline:** Launch date, phases, milestones
-💵 **Budget Range:** Investment range you're considering
-🎯 **Target Audience:** Users, devices, platforms
-🔧 **Technical Requirements:** Existing systems, integrations
-📈 **Business Goals:** Success metrics, KPIs
+Information We Need:
+📋 Project Type: Web, Mobile, AI, Cloud, Enterprise
+📊 Project Scope: Features, integrations, complexity
+⏰ Timeline: Launch date, phases, milestones
+💵 Budget Range: Investment range you're considering
+🎯 Target Audience: Users, devices, platforms
+🔧 Technical Requirements: Existing systems, integrations
+📈 Business Goals: Success metrics, KPIs
 
-**Our Pricing Approach:**
+Our Pricing Approach:
 ✅ Value-Based Pricing (ROI focused)
 ✅ Transparent Costs (No hidden fees)
 ✅ Flexible Payment Terms (Milestone-based)
@@ -267,20 +198,20 @@ Ready to start your project? We're here to help! 🚀`,
 ✅ Maintenance Included (6 months free)
 ✅ Scalable Solutions (Grow with your business)
 
-**Pricing Models:**
-🔹 **Fixed Price:** Best for defined scope projects
-🔹 **Time & Material:** Flexible for evolving requirements
-🔹 **Dedicated Team:** Long-term development partnerships
-🔹 **Hybrid Model:** Combination based on project phases
+Pricing Models:
+🔹 Fixed Price: Best for defined scope projects
+🔹 Time & Material: Flexible for evolving requirements
+🔹 Dedicated Team: Long-term development partnerships
+🔹 Hybrid Model: Combination based on project phases
 
-**Average Project Ranges (Estimates):**
+Average Project Ranges (Estimates):
 💻 Web Development: $5,000 - $50,000
 📱 Mobile Apps: $10,000 - $100,000
 🤖 AI Solutions: $15,000 - $150,000
 ☁️ Cloud Migration: $20,000 - $200,000
 🏢 Enterprise Software: $50,000 - $500,000
 
-**What's Included in Every Quote:**
+What's Included in Every Quote:
 ✅ Detailed project breakdown
 ✅ Technology recommendations
 ✅ Timeline with milestones
@@ -293,21 +224,407 @@ Ready to get your custom quote? Let's discuss your project! 🎯`,
     options: ["📞 Contact Us", "🎯 Our Process", "🌟 Our Services", "📧 Send Requirements"],
     category: "pricing"
   },
-  // ... [Continue with other quickOptions with enhanced formatting] ...
+  {
+    text: "🎯 Our Process",
+    response: `AspenCask Development Process 🔄
+
+Our Proven 6-Phase Methodology:
+
+Phase 1: Discovery & Strategy 🔍
+• Stakeholder interviews & requirement gathering
+• Business analysis & market research
+• Technical feasibility study
+• Competitive analysis
+• User persona development
+• Success metrics definition
+*Timeline: 1-2 weeks*
+
+Phase 2: Planning & Architecture 📋
+• Project roadmap & milestone planning
+• Technical architecture design
+• Technology stack selection
+• Resource allocation & team formation
+• Risk assessment & mitigation planning
+• Budget finalization & contract signing
+*Timeline: 1-2 weeks*
+
+Phase 3: Design & Prototyping 🎨
+• User experience (UX) research
+• Wireframing & user journey mapping
+• Visual design & brand integration
+• Interactive prototypes
+• Design system creation
+• Client approval & feedback incorporation
+*Timeline: 2-4 weeks*
+
+Phase 4: Development & Integration 💻
+• Agile development sprints (2-week cycles)
+• Regular code reviews & quality checks
+• Continuous integration & automated testing
+• API development & third-party integrations
+• Database design & optimization
+• Weekly progress demos & client feedback
+*Timeline: 8-20 weeks (varies by project)*
+
+Phase 5: Testing & Quality Assurance 🧪
+• Unit testing & integration testing
+• Performance testing & optimization
+• Security testing & vulnerability assessment
+• User acceptance testing (UAT)
+• Cross-browser & device testing
+• Load testing & scalability verification
+*Timeline: 2-3 weeks*
+
+Phase 6: Deployment & Launch 🚀
+• Production environment setup
+• Database migration & data import
+• Performance monitoring setup
+• Security implementation & SSL setup
+• Go-live support & monitoring
+• User training & documentation delivery
+*Timeline: 1 week*
+
+Post-Launch Support 🛠️
+• 6 months free maintenance & bug fixes
+• Performance monitoring & optimization
+• Security updates & patches
+• Feature enhancements & upgrades
+• 24/7 technical support
+• Regular health checks & reports
+
+Why Our Process Works:
+✅ 100% Project Success Rate - No failed projects
+✅ On-Time Delivery - 95% projects delivered on schedule
+✅ Budget Compliance - No cost overruns
+✅ Quality Assurance - Zero critical bugs post-launch
+✅ Client Satisfaction - 99.9% satisfaction rate
+✅ Transparent Communication - Daily/weekly updates
+
+Project Management Tools:
+📊 Jira - Task management & sprint planning
+💬 Slack - Real-time communication
+📹 Zoom - Regular video calls & demos
+📈 Confluence - Documentation & knowledge sharing
+🔄 GitHub - Code repository & version control
+📱 Mobile Apps - Progress tracking on-the-go
+
+Ready to start your project with our proven process? 🎯`,
+    options: ["🌟 Our Services", "💻 Technologies", "💰 Get Quote", "📞 Contact Us"],
+    category: "process"
+  },
+  {
+    text: "💻 Technologies",
+    response: `Our Technology Stack 🛠️
+
+Frontend Development:
+⚛️ React.js - Component-based UI development
+🔥 Next.js - Full-stack React framework
+🖥️ Vue.js - Progressive web app framework
+📱 React Native - Cross-platform mobile apps
+🎨 Tailwind CSS - Utility-first CSS framework
+📐 TypeScript - Type-safe JavaScript development
+
+Backend Development:
+🟢 Node.js - Server-side JavaScript runtime
+🐍 Python - AI/ML and web development
+☕ Java - Enterprise application development
+🔷 .NET Core - Microsoft ecosystem solutions
+🦀 Rust - High-performance system programming
+🐹 Go - Scalable microservices development
+
+Mobile Development:
+📱 React Native - Cross-platform apps
+🎯 Flutter - Google's UI toolkit
+🍎 Swift - Native iOS development
+🤖 Kotlin - Native Android development
+🔄 Xamarin - Microsoft mobile platform
+⚡ Ionic - Hybrid mobile apps
+
+Database Technologies:
+🍃 MongoDB - NoSQL document database
+🐘 PostgreSQL - Advanced relational database
+🔥 Firebase - Real-time database platform
+📊 Redis - In-memory data structure store
+🔍 Elasticsearch - Search and analytics engine
+❄️ Snowflake - Cloud data warehouse
+
+Cloud & DevOps:
+☁️ AWS - Amazon Web Services
+🔵 Azure - Microsoft Cloud Platform
+🟡 Google Cloud - Google Cloud Platform
+🐳 Docker - Containerization platform
+⚙️ Kubernetes - Container orchestration
+🔄 Jenkins - CI/CD automation server
+
+AI & Machine Learning:
+🧠 TensorFlow - Machine learning framework
+🔥 PyTorch - Deep learning platform
+🤗 Hugging Face - NLP model hub
+🐍 scikit-learn - Machine learning library
+📊 Pandas - Data manipulation library
+🔢 NumPy - Numerical computing library
+
+Blockchain & Web3:
+⚡ Ethereum - Smart contract platform
+🟣 Polygon - Layer 2 scaling solution
+🌐 Web3.js - Ethereum JavaScript API
+💎 Solidity - Smart contract programming
+🦊 MetaMask - Web3 wallet integration
+🌊 IPFS - Decentralized storage network
+
+Quality Assurance:
+🧪 Jest - JavaScript testing framework
+🎭 Playwright - End-to-end testing
+🔍 Selenium - Web application testing
+📊 SonarQube - Code quality analysis
+🛡️ OWASP ZAP - Security testing
+⚡ K6 - Performance testing tool
+
+Project Management:
+📊 Jira - Agile project management
+📝 Confluence - Team collaboration
+💬 Slack - Real-time communication
+📹 Zoom - Video conferencing
+📈 GitHub - Version control & collaboration
+📱 Notion - All-in-one workspace
+
+Why We Choose These Technologies:
+✅ Industry-Leading Performance
+✅ Proven Scalability & Reliability
+✅ Strong Community Support
+✅ Future-Proof Solutions
+✅ Cost-Effective Development
+✅ Easy Maintenance & Updates
+
+Technology Consultation:
+🎯 Architecture Reviews - System design evaluation
+📋 Technology Audits - Current stack assessment
+🔄 Migration Planning - Legacy system modernization
+📈 Performance Optimization - Speed & efficiency improvements
+🛡️ Security Hardening - Comprehensive security implementation
+
+Ready to leverage cutting-edge technology for your project? 💻✨`,
+    options: ["🌟 Our Services", "🎯 Our Process", "💰 Get Quote", "📞 Contact Us"],
+    category: "technology"
+  },
+  {
+    text: "📊 Case Studies",
+    response: `Our Success Stories 🏆
+
+Featured Case Studies:
+
+${caseStudies.map((study, index) => `
+${index + 1}. ${study.title}
+👥 Client: ${study.client}
+🏭 Industry: ${study.industry}
+⏱️ Duration: ${study.duration} | 👨‍💻 Team Size: ${study.teamSize}
+
+🎯 Challenge: ${study.challenge}
+
+💡 Solution: ${study.solution}
+
+📈 Results:
+${study.results.map(result => `  ✅ ${result}`).join('\n')}
+
+🛠️ Technologies: ${study.technologies.join(', ')}
+`).join('\n---\n')}
+
+Industry Expertise:
+🏥 Healthcare - Patient management, telemedicine, EHR systems
+🏦 Finance - Digital banking, payment processing, compliance
+🛒 E-commerce - Marketplaces, inventory management, analytics
+🎓 Education - Learning platforms, student management, assessments
+🏭 Manufacturing - IoT integration, automation, quality control
+🏘️ Real Estate - Property management, listing platforms, CRM
+🚚 Logistics - Supply chain, tracking systems, route optimization
+🎮 Entertainment - Streaming platforms, gaming, content management
+
+Client Testimonials:
+*"AspenCask transformed our healthcare operations completely. The platform they built helped us serve 40% more patients with the same resources."*
+- Dr. Sarah Johnson, MedCare Solutions
+
+*"The e-commerce platform exceeded our expectations. We saw 300% growth in the first year!"*
+- Mark Thompson, Global Market Hub
+
+*"Their AI-powered analytics helped us reduce operational costs by 50% while improving customer satisfaction."*
+- Lisa Chen, Tech Innovations Corp
+
+Success Metrics Across All Projects:
+📊 Average ROI: 400% within 18 months
+⚡ Performance Improvement: 60% faster operations
+💰 Cost Reduction: 45% average savings
+👥 User Satisfaction: 4.8/5 average rating
+🎯 Project Success Rate: 100% on-time delivery
+🔄 Client Retention: 95% long-term partnerships
+
+Awards & Recognition:
+🏆 Best Software Development Company 2024
+⭐ Top Rated on Clutch & GoodFirms
+🎖️ Innovation Excellence Award
+📜 ISO 9001:2015 Certified
+🛡️ SOC 2 Type II Compliant
+
+Ready to become our next success story? 🌟`,
+    options: ["💰 Get Quote", "📞 Contact Us", "🌟 Our Services", "🎯 Our Process"],
+    category: "portfolio"
+  },
+  {
+    text: "💼 Careers",
+    response: `Join the AspenCask Team! 🚀
+
+We're always looking for talented individuals to join our growing team.
+
+Current Job Openings:
+${jobPositions.length > 0
+  ? jobPositions.map(job => `• ${job.title} (${job.type}, ${job.location}) - Experience: ${job.experience}`).join('\n')
+  : "No open positions currently, but check back soon! We're growing fast!"
+}
+
+Why Work With Us?
+${workCulture.map(culture => `• ${culture.title}: ${culture.description}`).join('\n')}
+
+Benefits Include:
+• Competitive salary & performance bonuses
+• Health and wellness programs
+• Flexible working hours and remote options
+• Professional development and growth opportunities
+• Collaborative and supportive team environment
+• Exposure to cutting-edge technologies
+• Annual team retreats and company events
+• Learning stipend for courses and certifications
+
+Career Growth Path:
+🎯 Junior Developer → Senior Developer → Tech Lead → Architect
+📈 Clear promotion criteria and regular reviews
+🏆 Leadership development programs
+🌟 Mentorship from industry experts
+
+Work Environment:
+🏢 Modern office in Raj Bagh, Ghaziabad
+💻 Latest hardware and software tools
+🌐 Hybrid work model (office + remote)
+🍕 Free meals and snacks
+☕ Unlimited coffee and beverages
+
+Interested in a career with AspenCask? Visit our careers page or send your resume to careers@aspencask.com!`,
+    options: ["📞 Contact Us", "🏢 About Us", "🌟 Our Services"],
+    category: "careers"
+  },
+  {
+    text: "🤝 Social Media",
+    response: `Connect with AspenCask Solution LLP on Social Media! 📱
+
+Stay updated with our latest news, projects, and insights:
+
+${socialLinks.map(link => `• ${link.name}: ${link.url}`).join('\n')}
+
+What We Share:
+🚀 Latest project showcases
+💡 Technology insights and trends
+🎓 Development tutorials and tips
+🏆 Company achievements and milestones
+👥 Team highlights and culture
+📈 Industry news and analysis
+
+Follow us to:
+✅ Stay updated with our latest work
+✅ Get tech tips and best practices
+✅ Join our developer community
+✅ See behind-the-scenes content
+✅ Get early access to job openings
+✅ Connect with our team members
+
+Follow us to join our community and engage with our experts!`,
+    options: ["📞 Contact Us", "🌟 Our Services", "📊 Case Studies"],
+    category: "social"
+  },
+  {
+    text: "⭐ Testimonials",
+    response: `What Our Clients Say About Us 🗣️
+
+Here are some testimonials from our satisfied clients:
+
+${testimonials.map(testimonial => `
+"${testimonial.content}"
+- ${testimonial.name}, ${testimonial.position} at ${testimonial.company} (Rating: ${'⭐'.repeat(testimonial.rating)})
+`).join('\n---\n')}
+
+Client Satisfaction Metrics:
+📊 Overall Rating: 4.9/5 stars
+🎯 Project Success Rate: 100%
+🔄 Client Retention Rate: 95%
+⏰ On-Time Delivery: 95%
+💰 Budget Compliance: 98%
+🤝 Recommendation Rate: 97%
+
+What Makes Our Clients Happy:
+✅ Transparent communication throughout
+✅ Regular updates and progress demos
+✅ Quality deliverables on time
+✅ Post-launch support and maintenance
+✅ Scalable and future-proof solutions
+✅ Dedicated project management
+
+We pride ourselves on delivering exceptional results and building strong, lasting relationships with our clients. Your success is our success!`,
+    options: ["📊 Case Studies", "💰 Get Quote", "📞 Contact Us"],
+    category: "testimonials"
+  },
+  {
+    text: "📚 Our Projects",
+    response: `Explore Our Project Portfolio 🚀
+
+Here are some of our key projects:
+
+${projects.map(project => `
+• **${project.title}** (${project.category})
+*Description*: ${project.description}
+*Technologies*: ${project.technologies.join(', ')}
+`).join('\n---\n')}
+
+Project Categories:
+💻 Web Applications - 25+ projects
+📱 Mobile Apps - 15+ projects
+🤖 AI/ML Solutions - 10+ projects
+☁️ Cloud Migrations - 12+ projects
+🏢 Enterprise Systems - 8+ projects
+🔐 Security Solutions - 6+ projects
+
+Project Success Metrics:
+🎯 100% project completion rate
+⏰ 95% on-time delivery
+💰 Average 400% ROI for clients
+📈 60% performance improvement
+🛡️ Zero security incidents post-launch
+⭐ 4.9/5 average client satisfaction
+
+Industries We Serve:
+🏥 Healthcare & Medical
+🏦 Banking & Finance
+🛒 E-commerce & Retail
+🎓 Education & E-learning
+🏭 Manufacturing & IoT
+🏘️ Real Estate & PropTech
+🚚 Logistics & Supply Chain
+🎮 Entertainment & Media
+
+For more details on any project or to discuss a new one, feel free to ask or get a quote!`,
+    options: ["💰 Get Quote", "📊 Case Studies", "🌟 Our Services"],
+    category: "projects"
+  }
 ];
 
-// Enhanced service-specific responses
+// Service-specific responses for each category
 export const serviceResponses: { [key: string]: string } = services.reduce((acc, service) => {
-  acc[service.title] = `✨ **${service.title} Services** ✨
+  acc[service.title] = `✨ ${service.title} Services ✨
 
 ${service.description}
 
-**Key Features:**
+Key Features:
 ${service.features.map(feature => `• ${feature}`).join('\n')}
 
-${service.icon && service.icon !== '' ? `\n**Icon:** ${service.icon}` : ''}
+${service.icon && service.icon !== '' ? `\nIcon: ${service.icon}` : ''}
 
-🎯 **Why Choose Our ${service.title}?**
+🎯 Why Choose Our ${service.title}?
 ✅ Expert team with 5+ years experience
 ✅ Latest tools and technologies
 ✅ Agile development methodology
@@ -315,7 +632,7 @@ ${service.icon && service.icon !== '' ? `\n**Icon:** ${service.icon}` : ''}
 ✅ 24/7 support and maintenance
 ✅ Competitive pricing with transparent costs
 
-**Ready to get started?** Contact us for a free consultation!
+Ready to get started? Contact us for a free consultation!
 `;
   return acc;
 }, {} as { [key: string]: string });
@@ -326,29 +643,16 @@ interface KeywordResponse {
   options?: string[];
 }
 
-// Significantly enhanced getResponseByKeyword function
+// Enhanced getResponseByKeyword function with comprehensive matching
 export const getResponseByKeyword = (message: string): KeywordResponse | null => {
-  const lowerMessage = message.toLowerCase().trim();
+  const lowerMessage = message.toLowerCase();
   
-  // Handle empty or very short messages
-  if (!lowerMessage || lowerMessage.length < 2) {
-    return {
-      text: "I'd be happy to help! Could you please ask a specific question about our services, company, or how we can assist you?",
-      options: ["🌟 Our Services", "🏢 About Us", "📞 Contact Us", "💰 Get Quote"]
-    };
-  }
-
-  // Check for greetings first
-  if (isGreeting(lowerMessage)) {
-    return getGreetingResponse();
-  }
-
-  // Check for founder/owner queries using enhanced matching
+  // First check for founder/owner queries using enhanced matching
   if (containsFounderKeywords(message)) {
     return getFounderResponse();
   }
 
-  // Detect and respond to service-related queries
+  // Check for service-related queries
   const detectedService = detectServiceFromQuery(lowerMessage);
   if (detectedService) {
     const service = services.find(s => s.title.toLowerCase().includes(detectedService.toLowerCase()));
@@ -360,201 +664,134 @@ export const getResponseByKeyword = (message: string): KeywordResponse | null =>
     }
   }
 
-  // Detect question intent and provide appropriate responses
-  const questionIntent = detectQuestionIntent(lowerMessage);
-  if (questionIntent) {
-    const intentOption = quickOptions.find(opt => opt.category === questionIntent);
-    if (intentOption) {
-      return { text: intentOption.response, options: intentOption.options };
-    }
-  }
-
   const generalServiceOptions = serviceCategories.map(cat => cat.name).concat(["💰 Get Quote", "📞 Contact Us", "📊 Case Studies"]);
   const generalContactOptions = ["📅 Schedule Call", "📧 Send Email", "🌟 Our Services", "💰 Get Quote", "🤝 Social Media"];
   const generalCareerOptions = ["📞 Contact Us", "🏢 About Us", "🌟 Our Services"];
   const generalPortfolioOptions = ["💰 Get Quote", "📞 Contact Us", "🌟 Our Services", "🎯 Our Process"];
 
-  // Comprehensive keyword map with enhanced responses
+  // Enhanced keyword map with more comprehensive matching
   const keywordMap: { [key: string]: () => KeywordResponse } = {
-    // Service-specific features with enhanced responses
+    // Service-specific features
     'web development features': () => {
       const webService = services.find(s => s.title === 'Web Development');
       return {
-        text: webService ? `**Key features of our Web Development services:**\n${webService.features.map(f => `• ${f}`).join('\n')}\n\n🚀 We build **responsive, scalable, and SEO-optimized** websites that drive business growth!` : "I couldn't find specific features for Web Development. Please ask about our 'Web Development' service for a general overview.",
+        text: webService ? `Key features of our Web Development services:\n${webService.features.map(f => `• ${f}`).join('\n')}` : "I couldn't find specific features for Web Development. Please ask about our 'Web Development' service for a general overview.",
         options: generalServiceOptions
       };
     },
     'mobile development features': () => {
       const mobileService = services.find(s => s.title === 'App Development');
       return {
-        text: mobileService ? `**Key features of our Mobile App Development services:**\n${mobileService.features.map(f => `• ${f}`).join('\n')}\n\n📱 We create **cross-platform apps** that provide seamless user experiences across all devices!` : "I couldn't find specific features for Mobile Development. Please ask about our 'App Development' service for a general overview.",
+        text: mobileService ? `Key features of our Mobile App Development services:\n${mobileService.features.map(f => `• ${f}`).join('\n')}` : "I couldn't find specific features for Mobile Development. Please ask about our 'App Development' service for a general overview.",
         options: generalServiceOptions
       };
     },
     'ai features': () => {
       const aiService = services.find(s => s.title === 'AI & Machine Learning');
       return {
-        text: aiService ? `**Key features of our AI & Machine Learning services:**\n${aiService.features.map(f => `• ${f}`).join('\n')}\n\n🤖 We leverage **cutting-edge AI** to automate processes and provide intelligent insights!` : "I couldn't find specific features for AI & Machine Learning. Please ask about our 'AI & Machine Learning' service for a general overview.",
+        text: aiService ? `Key features of our AI & Machine Learning services:\n${aiService.features.map(f => `• ${f}`).join('\n')}` : "I couldn't find specific features for AI & Machine Learning. Please ask about our 'AI & Machine Learning' service for a general overview.",
         options: generalServiceOptions
       };
     },
     'cloud computing features': () => {
       const cloudService = services.find(s => s.title === 'Cloud Computing');
       return {
-        text: cloudService ? `**Key features of our Cloud Computing services:**\n${cloudService.features.map(f => `• ${f}`).join('\n')}\n\n☁️ We provide **scalable, secure, and cost-effective** cloud solutions!` : "I couldn't find specific features for Cloud Computing. Please ask about our 'Cloud Computing' service for a general overview.",
+        text: cloudService ? `Key features of our Cloud Computing services:\n${cloudService.features.map(f => `• ${f}`).join('\n')}` : "I couldn't find specific features for Cloud Computing. Please ask about our 'Cloud Computing' service for a general overview.",
         options: generalServiceOptions
       };
     },
 
-    // Enhanced contact information responses
-    'contact phone': () => ({ 
-      text: `📞 **Phone:** ${contactInfo.phone}\n\nYou can reach us immediately during business hours for quick consultations and urgent queries. We're always ready to help!`, 
-      options: generalContactOptions 
-    }),
-    'phone number': () => ({ 
-      text: `Our phone number is **${contactInfo.phone}**.\n\n🕒 We're available during business hours for immediate assistance, and we also provide 24/7 emergency support for critical issues.`, 
-      options: generalContactOptions 
-    }),
-    'contact email': () => ({ 
-      text: `📧 **Email:** ${contactInfo.email}\n\nWe typically respond within **2 hours** during business hours. Email us for detailed project discussions and requirements!`, 
-      options: generalContactOptions 
-    }),
-    'email address': () => ({ 
-      text: `Our email address is **${contactInfo.email}**.\n\n✅ Perfect for detailed project inquiries and file sharing. We guarantee a response within 2 hours!`, 
-      options: generalContactOptions 
-    }),
-    'office address': () => ({ 
-      text: `🏢 **Office Location:**\n${contactInfo.office.address}\n${contactInfo.office.city}, ${contactInfo.office.state} - ${contactInfo.office.pincode}\n\n📍 Visit us for **in-person consultations** and project discussions!`, 
-      options: generalContactOptions 
-    }),
-    'address': () => ({ 
-      text: `**AspenCask Solution LLP** is located at:\n📍 ${contactInfo.office.address}, ${contactInfo.office.city}, ${contactInfo.office.state} - ${contactInfo.office.pincode}\n\nWe welcome office visits by appointment!`, 
-      options: generalContactOptions 
-    }),
-    'location': () => ({ 
-      text: `We're located in **Raj Bagh, Ghaziabad**.\n\n🏢 **Full Address:**\n${contactInfo.office.address}\n${contactInfo.office.city}, ${contactInfo.office.state} - ${contactInfo.office.pincode}`, 
-      options: generalContactOptions 
-    }),
-    'business hours': () => ({ 
-      text: `🕒 **Business Hours:** ${contactInfo.businessHours}\n\nWe're here to help during these times! For urgent matters outside business hours, we also provide **24/7 emergency support**.`, 
-      options: generalContactOptions 
-    }),
-    'working hours': () => ({ 
-      text: `We work **${contactInfo.businessHours}**.\n\n⚡ For urgent matters, we also provide **24/7 emergency support** to ensure your business never stops!`, 
-      options: generalContactOptions 
-    }),
-    'support hours': () => ({ 
-      text: `🛠️ **Support Hours:** ${contactInfo.supportHours}\n\nWe also offer **24/7 emergency support** for critical issues. Your success is our priority!`, 
-      options: generalContactOptions 
-    }),
+    // Contact information
+    'contact phone': () => ({ text: `You can reach us by phone at ${contactInfo.phone}.`, options: generalContactOptions }),
+    'phone number': () => ({ text: `Our phone number is ${contactInfo.phone}. We're available during business hours for immediate assistance.`, options: generalContactOptions }),
+    'contact email': () => ({ text: `You can email us at ${contactInfo.email}. We typically respond within 2 hours during business hours.`, options: generalContactOptions }),
+    'email address': () => ({ text: `Our email address is ${contactInfo.email}. Feel free to reach out with any questions!`, options: generalContactOptions }),
+    'office address': () => ({ text: `Our office is located at ${contactInfo.office.address}, ${contactInfo.office.city}, ${contactInfo.office.state} - ${contactInfo.office.pincode}. Visit us for in-person consultations!`, options: generalContactOptions }),
+    'address': () => ({ text: `AspenCask Solution LLP is located at ${contactInfo.office.address}, ${contactInfo.office.city}, ${contactInfo.office.state} - ${contactInfo.office.pincode}.`, options: generalContactOptions }),
+    'location': () => ({ text: `We're located in Raj Bagh, Ghaziabad. Our full address is ${contactInfo.office.address}, ${contactInfo.office.city}, ${contactInfo.office.state} - ${contactInfo.office.pincode}.`, options: generalContactOptions }),
+    'business hours': () => ({ text: `Our business hours are ${contactInfo.businessHours}. We're here to help during these times!`, options: generalContactOptions }),
+    'working hours': () => ({ text: `We work ${contactInfo.businessHours}. For urgent matters, we also provide 24/7 emergency support.`, options: generalContactOptions }),
+    'support hours': () => ({ text: `Our support hours are ${contactInfo.supportHours}. We also offer 24/7 emergency support for critical issues.`, options: generalContactOptions }),
 
-    // Enhanced social media responses
-    'linkedin': () => ({ 
-      text: `🔗 **Connect with us on LinkedIn:**\n${socialLinks.find(link => link.name === 'LinkedIn')?.url || 'Not available.'}\n\nStay updated with our latest projects, industry insights, and company news!`, 
-      options: generalContactOptions 
-    }),
-    'twitter': () => ({ 
-      text: `🐦 **Follow us on Twitter:**\n${socialLinks.find(link => link.name === 'Twitter')?.url || 'Not available.'}\n\nGet real-time updates, tech tips, and industry trends!`, 
-      options: generalContactOptions 
-    }),
-    'github': () => ({ 
-      text: `💻 **Check out our GitHub:**\n${socialLinks.find(link => link.name === 'GitHub')?.url || 'Not available.'}\n\nExplore our open-source contributions and technical expertise!`, 
-      options: generalContactOptions 
-    }),
-    'instagram': () => ({ 
-      text: `📸 **Follow us on Instagram:**\n${socialLinks.find(link => link.name === 'Instagram')?.url || 'Not available.'}\n\nSee behind-the-scenes content, team highlights, and company culture!`, 
-      options: generalContactOptions 
-    }),
-    'facebook': () => ({ 
-      text: `👥 **Like us on Facebook:**\n${socialLinks.find(link => link.name === 'Facebook')?.url || 'Not available.'}\n\nJoin our community for updates, discussions, and networking!`, 
-      options: generalContactOptions 
-    }),
+    // Social media links
+    'linkedin': () => ({ text: `Connect with us on LinkedIn: ${socialLinks.find(link => link.name === 'LinkedIn')?.url || 'Not available.'}`, options: generalContactOptions }),
+    'twitter': () => ({ text: `Follow us on Twitter: ${socialLinks.find(link => link.name === 'Twitter')?.url || 'Not available.'}`, options: generalContactOptions }),
+    'github': () => ({ text: `Check out our GitHub: ${socialLinks.find(link => link.name === 'GitHub')?.url || 'Not available.'}`, options: generalContactOptions }),
+    'instagram': () => ({ text: `Follow us on Instagram: ${socialLinks.find(link => link.name === 'Instagram')?.url || 'Not available.'}`, options: generalContactOptions }),
+    'facebook': () => ({ text: `Like us on Facebook: ${socialLinks.find(link => link.name === 'Facebook')?.url || 'Not available.'}`, options: generalContactOptions }),
 
-    // Enhanced career-related responses
+    // Career-related queries
     'current jobs': () => ({
       text: jobPositions.length > 0
-        ? `**Current Job Openings at AspenCask:**\n${jobPositions.map(job => `• **${job.title}** (${job.type}, ${job.location}) - Experience: ${job.experience}`).join('\n')}\n\n💼 **Interested?** Send your resume to **careers@aspencask.com**\n\n🚀 Join our team and work on cutting-edge technology projects!`
-        : "We currently have no open positions, but **we're always looking for talented individuals!** 🌟\n\nSend your resume to **careers@aspencask.com** and we'll keep you in mind for future opportunities!",
+        ? `Here are our current job openings:\n${jobPositions.map(job => `• ${job.title} (${job.type}, ${job.location}) - Experience: ${job.experience}`).join('\n')}\n\nInterested? Send your resume to careers@aspencask.com`
+        : "We currently have no open positions, but please check back later! We're always looking for talented individuals.",
       options: generalCareerOptions
     }),
     'job openings': () => ({
       text: jobPositions.length > 0
-        ? `**Job Opportunities at AspenCask:**\n${jobPositions.map(job => `• **${job.title}** (${job.type}, ${job.location})\n  Experience Required: ${job.experience}`).join('\n\n')}\n\n📧 **Apply now:** careers@aspencask.com`
-        : "No current openings, but we're **growing fast!** 📈\n\nCheck back soon or send your resume to **careers@aspencask.com** for future opportunities!",
+        ? `Current job openings at AspenCask:\n${jobPositions.map(job => `• ${job.title} (${job.type}, ${job.location}) - Experience: ${job.experience}`).join('\n')}`
+        : "No current openings, but we're growing fast! Check back soon or send your resume to careers@aspencask.com",
       options: generalCareerOptions
     }),
     'work culture': () => ({ 
-      text: `**At AspenCask, our work culture is defined by:**\n${workCulture.map(culture => `• **${culture.title}:** ${culture.description}`).join('\n')}\n\n🌟 **Join our team** and experience a workplace that values innovation, collaboration, and personal growth!`, 
+      text: `At AspenCask, our work culture is defined by:\n${workCulture.map(culture => `• ${culture.title}: ${culture.description}`).join('\n')}\n\nJoin our team and experience a workplace that values innovation, collaboration, and growth!`, 
       options: generalCareerOptions 
     }),
     'company culture': () => ({ 
-      text: `**Our company culture at AspenCask focuses on:**\n${workCulture.map(culture => `• **${culture.title}:** ${culture.description}`).join('\n')}\n\n💫 We believe in creating an environment where **everyone can thrive** and reach their full potential!`, 
+      text: `Our company culture at AspenCask focuses on:\n${workCulture.map(culture => `• ${culture.title}: ${culture.description}`).join('\n')}\n\nWe believe in creating an environment where everyone can thrive!`, 
       options: generalCareerOptions 
     }),
 
-    // Enhanced testimonials and portfolio responses
+    // Testimonials and portfolio
     'latest testimonial': () => ({
       text: testimonials.length > 0
-        ? `**Here's our latest client testimonial:**\n\n💬 *"${testimonials[0].content}"*\n\n— **${testimonials[0].name}**, ${testimonials[0].position} at ${testimonials[0].company}\n\n⭐ **Rating:** ${'⭐'.repeat(testimonials[0].rating)}\n\nWe're proud of our **99.9% client satisfaction rate!**`
-        : "We don't have testimonials available right now, but we're proud of our **99.9% client satisfaction rate!** 🌟\n\nContact us to see how we can help your business succeed!",
+        ? `Here's our latest client testimonial:\n"${testimonials[0].content}" - ${testimonials[0].name}, ${testimonials[0].position} at ${testimonials[0].company}\n\nRating: ${'⭐'.repeat(testimonials[0].rating)}`
+        : "We don't have testimonials available right now, but we're proud of our 99.9% client satisfaction rate!",
       options: generalPortfolioOptions
     }),
     'client feedback': () => ({
       text: testimonials.length > 0
-        ? `**Our clients love working with us!** Here's some recent feedback:\n\n💬 *"${testimonials[0].content}"*\n\n— **${testimonials[0].name}**, ${testimonials[0].position} at ${testimonials[0].company}\n\n🏆 **99.9% client satisfaction rate** speaks for itself!`
-        : "We maintain a **99.9% client satisfaction rate!** 🎯\n\nContact us to see how we can help transform your business with technology!",
+        ? `Our clients love working with us! Here's some recent feedback:\n"${testimonials[0].content}" - ${testimonials[0].name}, ${testimonials[0].position} at ${testimonials[0].company}`
+        : "We maintain a 99.9% client satisfaction rate. Contact us to see how we can help your business!",
       options: generalPortfolioOptions
     }),
     'project list': () => ({
       text: projects.length > 0
-        ? `**Some of our notable projects include:**\n${projects.map(p => `• **${p.title}** (${p.category})`).join('\n')}\n\n🏆 We've completed **50+ successful projects** across various industries!\n\nWant to see more details? Check out our case studies!`
-        : "We have an extensive portfolio of **50+ successful projects!** 🚀\n\nContact us to learn more about our work and how we can help your business!",
+        ? `Some of our notable projects include:\n${projects.map(p => `• ${p.title} (${p.category})`).join('\n')}\n\nWe've completed 50+ successful projects across various industries!`
+        : "We have an extensive portfolio of successful projects. Contact us to learn more!",
       options: generalPortfolioOptions
     }),
     'portfolio': () => ({
       text: projects.length > 0
-        ? `**Our project portfolio includes:**\n${projects.map(p => `• **${p.title}** (${p.category})\n  ${p.description}`).join('\n\n')}\n\n📊 **50+ successful projects** with **100% client satisfaction!**`
-        : "We have a comprehensive portfolio of **50+ successful projects** across diverse industries! 🌟\n\nGet in touch to see our work and discuss your project!",
+        ? `Our project portfolio includes:\n${projects.map(p => `• ${p.title} (${p.category}) - ${p.description}`).join('\n')}`
+        : "We have a comprehensive portfolio of 50+ successful projects. Get in touch to see our work!",
       options: generalPortfolioOptions
     }),
 
-    // Enhanced pricing and technology responses
+    // Pricing and quote related
     'pricing': () => ({
-      text: `**Our pricing is transparent and competitive:**\n\n💻 **Web Development:** $5,000 - $50,000\n📱 **Mobile Apps:** $10,000 - $100,000\n🤖 **AI Solutions:** $15,000 - $150,000\n☁️ **Cloud Migration:** $20,000 - $200,000\n🏢 **Enterprise Software:** $50,000 - $500,000\n\n✅ **Value-based pricing** with **no hidden costs**\n🎯 Get a **custom quote** for your specific requirements!`,
+      text: `Our pricing is transparent and competitive:\n\n💻 Web Development: $5,000 - $50,000\n📱 Mobile Apps: $10,000 - $100,000\n🤖 AI Solutions: $15,000 - $150,000\n☁️ Cloud Migration: $20,000 - $200,000\n🏢 Enterprise Software: $50,000 - $500,000\n\nGet a custom quote for your specific requirements!`,
       options: ["💰 Get Quote", "📞 Contact Us", "🌟 Our Services"]
     }),
     'cost': () => ({
-      text: `**Project costs vary based on complexity and requirements.** We offer:\n\n✅ **Value-based pricing** (ROI focused)\n✅ **Transparent costs** (No hidden fees)\n✅ **Flexible payment terms**\n✅ **Multiple pricing models**\n\n💡 **Contact us** for a **free consultation** and custom quote tailored to your needs!`,
+      text: `Project costs vary based on complexity and requirements. We offer:\n\n✅ Value-based pricing (ROI focused)\n✅ Transparent costs (No hidden fees)\n✅ Flexible payment terms\n✅ Multiple pricing models\n\nContact us for a free consultation and custom quote!`,
       options: ["💰 Get Quote", "📞 Contact Us", "🎯 Our Process"]
     }),
+
+    // Technology related
     'technologies used': () => ({
-      text: `**We work with cutting-edge technologies:**\n\n🖥️ **Frontend:** React, Vue, Next.js, TypeScript\n⚙️ **Backend:** Node.js, Python, Java, .NET\n📱 **Mobile:** React Native, Flutter, Swift, Kotlin\n☁️ **Cloud:** AWS, Azure, Google Cloud\n🤖 **AI/ML:** TensorFlow, PyTorch, scikit-learn\n\n🚀 **And many more!** Check our full tech stack for comprehensive details.`,
+      text: `We work with cutting-edge technologies:\n\n🖥️ Frontend: React, Vue, Next.js, TypeScript\n⚙️ Backend: Node.js, Python, Java, .NET\n📱 Mobile: React Native, Flutter, Swift, Kotlin\n☁️ Cloud: AWS, Azure, Google Cloud\n🤖 AI/ML: TensorFlow, PyTorch, scikit-learn\n\nAnd many more! Check our full tech stack.`,
       options: ["💻 Technologies", "🌟 Our Services", "💰 Get Quote"]
     }),
     'tech stack': () => ({
-      text: `**Our comprehensive tech stack includes modern technologies across all domains:**\n\n• **Frontend frameworks** and libraries\n• **Backend technologies** and databases\n• **Cloud platforms** and DevOps tools\n• **AI/ML frameworks**\n• **Mobile development** platforms\n\n🛠️ **Explore our complete technology offerings** to see how we can bring your vision to life!`,
+      text: `Our comprehensive tech stack includes modern technologies across all domains:\n\n• Frontend frameworks and libraries\n• Backend technologies and databases\n• Cloud platforms and DevOps tools\n• AI/ML frameworks\n• Mobile development platforms\n\nExplore our complete technology offerings!`,
       options: ["💻 Technologies", "🌟 Our Services", "📞 Contact Us"]
-    }),
-
-    // Additional helpful responses
-    'help': () => ({
-      text: "**I'm here to help!** 🤝\n\nYou can ask me about:\n• Our services and capabilities\n• Pricing and quotes\n• Contact information\n• Company information\n• Technologies we use\n• Our portfolio and case studies\n• Career opportunities\n\n**What would you like to know?**",
-      options: ["🌟 Our Services", "💰 Get Quote", "🏢 About Us", "📞 Contact Us"]
-    }),
-    'thank you': () => ({
-      text: "**You're very welcome!** 😊\n\nWe're always here to help. Is there anything else you'd like to know about AspenCask Solution LLP or how we can assist with your technology needs?",
-      options: ["🌟 Our Services", "💰 Get Quote", "📞 Contact Us", "📊 Case Studies"]
-    }),
-    'thanks': () => ({
-      text: "**My pleasure!** ✨\n\nFeel free to ask if you have any other questions. We're excited to potentially work with you on your next project!",
-      options: ["💰 Get Quote", "📞 Contact Us", "🌟 Our Services"]
     })
   };
 
-  // Check for specific keyword matches with fuzzy matching
+  // Check for specific keyword matches
   for (const [keyword, getResponse] of Object.entries(keywordMap)) {
-    if (lowerMessage.includes(keyword) || 
-        keyword.split(' ').every(word => lowerMessage.includes(word))) {
+    if (lowerMessage.includes(keyword)) {
       return getResponse();
     }
   }
@@ -582,9 +819,23 @@ export const getResponseByKeyword = (message: string): KeywordResponse | null =>
     }
   }
 
-  // Enhanced fallback response for unmatched queries
-  return {
-    text: "I'd be happy to help! 😊\n\nI didn't quite understand your question, but I can assist you with:\n\n• **Services** we offer\n• **Pricing** and quotes\n• **Contact** information\n• **About** our company\n• **Technologies** we use\n• **Portfolio** and case studies\n\n**What would you like to know more about?**",
-    options: ["🌟 Our Services", "💰 Get Quote", "🏢 About Us", "📞 Contact Us", "💻 Technologies", "📊 Case Studies"]
-  };
+  // Check for common question patterns
+  if (lowerMessage.includes('what') || lowerMessage.includes('how') || lowerMessage.includes('why')) {
+    if (lowerMessage.includes('service') || lowerMessage.includes('do you do')) {
+      const servicesOption = quickOptions.find(opt => opt.category === 'services');
+      return { text: servicesOption!.response, options: servicesOption!.options };
+    }
+    
+    if (lowerMessage.includes('contact') || lowerMessage.includes('reach')) {
+      const contactOption = quickOptions.find(opt => opt.category === 'contact');
+      return { text: contactOption!.response, options: contactOption!.options };
+    }
+    
+    if (lowerMessage.includes('about') || lowerMessage.includes('company')) {
+      const aboutOption = quickOptions.find(opt => opt.category === 'about');
+      return { text: aboutOption!.response, options: aboutOption!.options };
+    }
+  }
+
+  return null;
 };
