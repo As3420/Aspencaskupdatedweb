@@ -1,10 +1,8 @@
-// src/data/chatResponses.ts
-
 import { QuickOption } from '../types/chat';
 import { serviceCategories, caseStudies } from './service';
-import { jobPositions, workCulture } from './careers'; // Ensure workCulture is imported
+import { jobPositions, workCulture } from './careers'; 
 import { contactInfo } from './contact';
-import { projects } from './projects'; // Import projects data
+import { projects } from './projects';
 import { socialLinks } from './social';
 import { testimonials } from './testimonials';
 import { services } from './services'; 
@@ -515,6 +513,16 @@ export const getResponseByKeyword = (message: string): KeywordResponse | null =>
 
   // Enhanced keyword map to include more direct data retrieval
   const keywordMap: { [key: string]: () => KeywordResponse } = {
+
+    'founder name': () => ({
+      text: "The founders of AspenCask Solution LLP are Ashish Kumar, Piyush Ranjan, and Chandan Kumar. Our office is located in Raj Bagh, Ghaziabad.",
+      options: ["🏢 About Us", "📞 Contact Us"]
+    }),
+    'company owner': () => ({
+      text: "The founders and owners of AspenCask Solution LLP are Ashish Kumar, Piyush Ranjan, and Chandan Kumar. Our office is located in Raj Bagh, Ghaziabad.",
+      options: ["🏢 About Us", "📞 Contact Us"]
+    }),
+    
     'web development features': () => {
       const webService = services.find(s => s.title === 'Web Development');
       return {
