@@ -4,12 +4,11 @@ import { useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Message } from '../types/chat';
 // Import all necessary data and response helpers
-import { quickOptions, getResponseByKeyword, serviceResponses } from '../data/chatResponses';
-import { serviceCategories } from '../data/service'; // To list service names in initial message options
+import { quickOptions, getResponseByKeyword } from '../data/chatResponses';
 import { contactInfo } from '../data/contact';
 import { socialLinks } from '../data/social';
 import { testimonials } from '../data/testimonials';
-import { jobPositions } from '../data/careers';
+import { jobPositions, workCulture } from '../data/careers'; // Import workCulture
 import { projects } from '../data/projects';
 import { services } from '../data/services'; // Ensure detailed services are imported for context
 
@@ -194,31 +193,17 @@ export const useChat = (): ChatHook => {
     setInputValue(''); // Clear the input field
 
     // --- Check for predefined responses first ---
-    const staticResponse = getResponseByKeyword(userMessageText); // Use getResponseByKeyword for user input
+    const keywordResponse = getResponseByKeyword(userMessageText); // Use getResponseByKeyword for user input
 
-    if (staticResponse) {
+    if (keywordResponse) {
       // If a static response is found, use it directly
-      let optionsToSend: string[] = [];
-      
-      // Try to find matching options from quickOptions or serviceCategories
-      const quickOptionMatch = quickOptions.find(opt => opt.response === staticResponse);
-      if (quickOptionMatch) {
-        optionsToSend = quickOptionMatch.options || [];
-      } else {
-        // If it's a service response, try to find the category to get related options
-        const serviceCategoryMatch = serviceCategories.find(cat => serviceResponses[cat.name] === staticResponse);
-        if (serviceCategoryMatch) {
-          optionsToSend = serviceCategories.map(cat => cat.name).concat(["💰 Get Quote", "📞 Contact Us", "📊 Case Studies"]);
-        }
-      }
+      addBotMessage(keywordResponse.text, keywordResponse.options); // Provide static response and relevant options
 
-      addBotMessage(staticResponse, optionsToSend); // Provide static response and relevant options
-
-      // Optionally, update chatHistory with this exchange if you want Gemini to be aware of it
+      // Update chatHistory with this exchange
       setChatHistory(prevHistory => [
          ...prevHistory,
          { role: 'user', parts: [{ text: userMessageText }] },
-         { role: 'model', parts: [{ text: staticResponse }] },
+         { role: 'model', parts: [{ text: keywordResponse.text }] },
       ]);
 
     } else {
@@ -238,34 +223,19 @@ export const useChat = (): ChatHook => {
     };
     setMessages(prevMessages => [...prevMessages, newUserMessage]);
 
-    // Find the corresponding quick option object
-    const selectedQuickOption = quickOptions.find(opt => opt.text === option);
-    
-    // Check if the option is a direct service name from serviceResponses
-    const serviceDetailResponse = serviceResponses[option];
+    // Check for predefined responses based on the option clicked
+    const keywordResponse = getResponseByKeyword(option);
 
-    if (serviceDetailResponse) {
-      // If it's a service detail, provide that response and associated options from quickOptions
-      const relatedQuickOption = quickOptions.find(opt => opt.category === 'services'); // Find the main services option to get its sub-options
-      addBotMessage(serviceDetailResponse, relatedQuickOption?.options);
+    if (keywordResponse) {
+      addBotMessage(keywordResponse.text, keywordResponse.options);
       // Add to chat history
       setChatHistory(prevHistory => [
         ...prevHistory,
         { role: 'user', parts: [{ text: option }] },
-        { role: 'model', parts: [{ text: serviceDetailResponse }] },
-      ]);
-    } else if (selectedQuickOption && selectedQuickOption.response) {
-      // If it's a main quick option, provide its defined response and options
-      addBotMessage(selectedQuickOption.response, selectedQuickOption.options);
-      // Add to chat history
-      setChatHistory(prevHistory => [
-        ...prevHistory,
-        { role: 'user', parts: [{ text: option }] },
-        { role: 'model', parts: [{ text: selectedQuickOption.response }] },
+        { role: 'model', parts: [{ text: keywordResponse.text }] },
       ]);
     } else {
-      // If no predefined response or options, or if it's a dynamic option not covered by static responses,
-      // fall back to Gemini API (e.g., "Yes", "No" from previous example or general questions after a detailed response)
+      // Fallback to Gemini API if no specific keyword response is found for the option
       callGeminiAPI(option, chatHistory);
     }
   }, [callGeminiAPI, chatHistory, addBotMessage]);

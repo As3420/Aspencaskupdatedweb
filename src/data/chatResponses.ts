@@ -2,12 +2,12 @@
 
 import { QuickOption } from '../types/chat';
 import { serviceCategories, caseStudies } from './service';
-import { jobPositions, workCulture } from './careers';
+import { jobPositions, workCulture } from './careers'; // Ensure workCulture is imported
 import { contactInfo } from './contact';
-import { projects } from './projects';
+import { projects } from './projects'; // Import projects data
 import { socialLinks } from './social';
 import { testimonials } from './testimonials';
-import { services } from './services'; // Assuming services.ts provides detailed service objects
+import { services } from './services'; 
 
 export const quickOptions: QuickOption[] = [
   {
@@ -86,9 +86,6 @@ Business Hours (IST):
 Support Hours:
 🕒 ${contactInfo.supportHours}
 (24/7 Emergency Support Available)
-
-Office Location:
-🏢 ${contactInfo.office.address}, ${contactInfo.office.city}, ${contactInfo.office.state} - ${contactInfo.office.pincode}
 
 What to Expect:
 ✅ FREE initial consultation (30 min)
@@ -328,7 +325,7 @@ Quality Assurance:
 Project Management:
 📊 Jira - Agile project management
 📝 Confluence - Team collaboration
-💬 Slack - Team communication
+💬 Slack - Real-time communication
 📹 Zoom - Video conferencing
 📈 GitHub - Version control & collaboration
 📱 Notion - All-in-one workspace
@@ -339,7 +336,7 @@ Why We Choose These Technologies:
 ✅ Strong Community Support
 ✅ Future-Proof Solutions
 ✅ Cost-Effective Development
-✅ Easy Maintenance & Updates
+✅ Easy Maintenance & & Updates
 
 Technology Consultation:
 🎯 Architecture Reviews - System design evaluation
@@ -487,6 +484,7 @@ For more details on any project or to discuss a new one, feel free to ask or get
 ];
 
 // Service-specific responses for each category, now dynamically pulled from 'services' data
+// This should contain the detailed service descriptions.
 export const serviceResponses: { [key: string]: string } = services.reduce((acc, service) => {
   acc[service.title] = `✨ ${service.title} Services ✨
 
@@ -501,101 +499,111 @@ ${service.icon && service.icon !== '' ? `\nIcon: ${service.icon}` : ''}
 }, {} as { [key: string]: string });
 
 
-// Additional helper functions for keyword matching
-export const getResponseByKeyword = (message: string): string | null => {
+// New return type for getResponseByKeyword
+interface KeywordResponse {
+  text: string;
+  options?: string[]; // Optional follow-up options
+}
+
+export const getResponseByKeyword = (message: string): KeywordResponse | null => {
   const lowerMessage = message.toLowerCase();
 
+  const generalServiceOptions = serviceCategories.map(cat => cat.name).concat(["💰 Get Quote", "📞 Contact Us", "📊 Case Studies"]);
+  const generalContactOptions = ["📅 Schedule Call", "📧 Send Email", "🌟 Our Services", "💰 Get Quote", "🤝 Social Media"];
+  const generalCareerOptions = ["📞 Contact Us", "🏢 About Us", "🌟 Our Services"];
+  const generalPortfolioOptions = ["💰 Get Quote", "📞 Contact Us", "🌟 Our Services", "🎯 Our Process"];
+
+
   // Enhanced keyword map to include more direct data retrieval
-  const keywordMap: { [key: string]: string | (() => string) } = {
+  const keywordMap: { [key: string]: () => KeywordResponse } = {
     'web development features': () => {
       const webService = services.find(s => s.title === 'Web Development');
-      return webService ? `Key features of our Web Development services:\n${webService.features.map(f => `• ${f}`).join('\n')}` : "I couldn't find specific features for Web Development. Please ask about our 'Web Development' service for a general overview.";
+      return {
+        text: webService ? `Key features of our Web Development services:\n${webService.features.map(f => `• ${f}`).join('\n')}` : "I couldn't find specific features for Web Development. Please ask about our 'Web Development' service for a general overview.",
+        options: generalServiceOptions
+      };
     },
     'mobile development features': () => {
-      const mobileService = services.find(s => s.title === 'App Development'); // Assuming App Development covers mobile
-      return mobileService ? `Key features of our Mobile App Development services:\n${mobileService.features.map(f => `• ${f}`).join('\n')}` : "I couldn't find specific features for Mobile Development. Please ask about our 'App Development' service for a general overview.";
+      const mobileService = services.find(s => s.title === 'App Development');
+      return {
+        text: mobileService ? `Key features of our Mobile App Development services:\n${mobileService.features.map(f => `• ${f}`).join('\n')}` : "I couldn't find specific features for Mobile Development. Please ask about our 'App Development' service for a general overview.",
+        options: generalServiceOptions
+      };
     },
     'ai features': () => {
       const aiService = services.find(s => s.title === 'AI & Machine Learning');
-      return aiService ? `Key features of our AI & Machine Learning services:\n${aiService.features.map(f => `• ${f}`).join('\n')}` : "I couldn't find specific features for AI & Machine Learning. Please ask about our 'AI & Machine Learning' service for a general overview.";
+      return {
+        text: aiService ? `Key features of our AI & Machine Learning services:\n${aiService.features.map(f => `• ${f}`).join('\n')}` : "I couldn't find specific features for AI & Machine Learning. Please ask about our 'AI & Machine Learning' service for a general overview.",
+        options: generalServiceOptions
+      };
     },
     'cloud computing features': () => {
       const cloudService = services.find(s => s.title === 'Cloud Computing');
-      return cloudService ? `Key features of our Cloud Computing services:\n${cloudService.features.map(f => `• ${f}`).join('\n')}` : "I couldn't find specific features for Cloud Computing. Please ask about our 'Cloud Computing' service for a general overview.";
+      return {
+        text: cloudService ? `Key features of our Cloud Computing services:\n${cloudService.features.map(f => `• ${f}`).join('\n')}` : "I couldn't find specific features for Cloud Computing. Please ask about our 'Cloud Computing' service for a general overview.",
+        options: generalServiceOptions
+      };
     },
-    'contact phone': () => `You can reach us by phone at ${contactInfo.phone}.`,
-    'contact email': () => `You can email us at ${contactInfo.email}.`,
-    'office address': () => `Our office is located at ${contactInfo.office.address}, ${contactInfo.office.city}, ${contactInfo.office.state} - ${contactInfo.office.pincode}.`,
-    'business hours': () => `Our business hours are ${contactInfo.businessHours}.`,
-    'support hours': () => `Our support hours are ${contactInfo.supportHours}.`,
-    'linkedin': () => `Connect with us on LinkedIn: ${socialLinks.find(link => link.name === 'LinkedIn')?.url || 'Not available.'}`,
-    'twitter': () => `Follow us on Twitter: ${socialLinks.find(link => link.name === 'Twitter')?.url || 'Not available.'}`,
-    'github': () => `Check out our GitHub: ${socialLinks.find(link => link.name === 'GitHub')?.url || 'Not available.'}`,
-    'instagram': () => `Follow us on Instagram: ${socialLinks.find(link => link.name === 'Instagram')?.url || 'Not available.'}`,
-    'facebook': () => `Like us on Facebook: ${socialLinks.find(link => link.name === 'Facebook')?.url || 'Not available.'}`,
-    'current jobs': () => jobPositions.length > 0
-      ? `Here are our current job openings:\n${jobPositions.map(job => `• ${job.title} (${job.type}, ${job.location}) - Experience: ${job.experience}`).join('\n')}`
-      : "We currently have no open positions, but please check back later!",
-    'work culture': () => `At AspenCask, our work culture is defined by:\n${workCulture.map(culture => `• ${culture.title}: ${culture.description}`).join('\n')}`,
-    'latest testimonial': () => testimonials.length > 0
-      ? `Here's our latest client testimonial:\n"${testimonials[0].content}" - ${testimonials[0].name}, ${testimonials[0].position} at ${testimonials[0].company}`
-      : "We don't have testimonials available right now.",
-    'project list': () => projects.length > 0
-      ? `Some of our notable projects include:\n${projects.map(p => `• ${p.title} (${p.category})`).join('\n')}`
-      : "We don't have project details available right now.",
-
-    // General quick option and service mapping (as before)
-    'service': '🌟 Our Services',
-    'services': '🌟 Our Services',
-    'about': '🏢 About Us',
-    'company': '🏢 About Us',
-    'contact': '📞 Contact Us',
-    'phone': '📞 Contact Us', // Will be overridden by specific 'contact phone' if present
-    'email': '📞 Contact Us', // Will be overridden by specific 'contact email' if present
-    'quote': '💰 Get Quote',
-    'price': '💰 Get Quote',
-    'pricing': '💰 Get Quote',
-    'cost': '💰 Get Quote',
-    'process': '🎯 Our Process',
-    'methodology': '🎯 Our Process',
-    'technologies': '💻 Technologies',
-    'tech stack': '💻 Technologies',
-    'stack': '💻 Technologies',
-    'case studies': '📊 Case Studies',
-    'case study': '📊 Case Studies',
-    'portfolio': '📊 Case Studies',
-    'success stories': '📊 Case Studies',
-    'careers': '💼 Careers',
-    'job': '💼 Careers',
-    'jobs': '💼 Careers',
-    'hiring': '💼 Careers',
-    'social': '🤝 Social Media',
-    'testimonials': '⭐ Testimonials',
-    'client reviews': '⭐ Testimonials',
-    'reviews': '⭐ Testimonials',
-    'projects': '📚 Our Projects',
-    'work': '📚 Our Projects',
+    'contact phone': () => ({ text: `You can reach us by phone at ${contactInfo.phone}.`, options: generalContactOptions }),
+    'contact email': () => ({ text: `You can email us at ${contactInfo.email}.`, options: generalContactOptions }),
+    'office address': () => ({ text: `Our office is located at ${contactInfo.office.address}, ${contactInfo.office.city}, ${contactInfo.office.state} - ${contactInfo.office.pincode}.`, options: generalContactOptions }),
+    'business hours': () => ({ text: `Our business hours are ${contactInfo.businessHours}.`, options: generalContactOptions }),
+    'support hours': () => ({ text: `Our support hours are ${contactInfo.supportHours}.`, options: generalContactOptions }),
+    'linkedin': () => ({ text: `Connect with us on LinkedIn: ${socialLinks.find(link => link.name === 'LinkedIn')?.url || 'Not available.'}`, options: generalContactOptions }),
+    'twitter': () => ({ text: `Follow us on Twitter: ${socialLinks.find(link => link.name === 'Twitter')?.url || 'Not available.'}`, options: generalContactOptions }),
+    'github': () => ({ text: `Check out our GitHub: ${socialLinks.find(link => link.name === 'GitHub')?.url || 'Not available.'}`, options: generalContactOptions }),
+    'instagram': () => ({ text: `Follow us on Instagram: ${socialLinks.find(link => link.name === 'Instagram')?.url || 'Not available.'}`, options: generalContactOptions }),
+    'facebook': () => ({ text: `Like us on Facebook: ${socialLinks.find(link => link.name === 'Facebook')?.url || 'Not available.'}`, options: generalContactOptions }),
+    'current jobs': () => ({
+      text: jobPositions.length > 0
+        ? `Here are our current job openings:\n${jobPositions.map(job => `• ${job.title} (${job.type}, ${job.location}) - Experience: ${job.experience}`).join('\n')}`
+        : "We currently have no open positions, but please check back later!",
+      options: generalCareerOptions
+    }),
+    'work culture': () => ({ text: `At AspenCask, our work culture is defined by:\n${workCulture.map(culture => `• ${culture.title}: ${culture.description}`).join('\n')}`, options: generalCareerOptions }),
+    'latest testimonial': () => ({
+      text: testimonials.length > 0
+        ? `Here's our latest client testimonial:\n"${testimonials[0].content}" - ${testimonials[0].name}, ${testimonials[0].position} at ${testimonials[0].company}`
+        : "We don't have testimonials available right now.",
+      options: generalPortfolioOptions
+    }),
+    'project list': () => ({
+      text: projects.length > 0
+        ? `Some of our notable projects include:\n${projects.map(p => `• ${p.title} (${p.category})`).join('\n')}`
+        : "We don't have project details available right now.",
+      options: generalPortfolioOptions
+    }),
   };
 
-  for (const [keyword, responseValue] of Object.entries(keywordMap)) {
+  // Check for specific keyword matches
+  for (const [keyword, getResponse] of Object.entries(keywordMap)) {
     if (lowerMessage.includes(keyword)) {
-      if (typeof responseValue === 'function') {
-        return responseValue(); // Execute the function to get the dynamic response
-      } else if (serviceResponses[responseValue]) {
-        return serviceResponses[responseValue]; // Return detailed service response
-      } else {
-        const quickOptionMatch = quickOptions.find(opt => opt.text === responseValue || opt.category === responseValue.toLowerCase().replace('🌟 ', '').replace('🏢 ', '').replace('📞 ', '').replace('💰 ', '').replace('🎯 ', '').replace('💻 ', '').replace('📊 ', '').replace('💼 ', '').replace('🤝 ', '').replace('⭐ ', '').replace('📚 ', '').replace(' ', ''));
-        if (quickOptionMatch) {
-          return quickOptionMatch.response; // Return quick option response
-        }
-      }
+      return getResponse();
     }
   }
 
-  // Fallback for direct service name matches that aren't explicit keywords in the map
+  // Check for direct quick option text matches (normalized)
+  for (const option of quickOptions) {
+    // Normalize quick option text for matching (remove icons, spaces)
+    const normalizedOptionText = option.text.toLowerCase()
+      .replace(/🌟 |🏢 |📞 |💰 |🎯 |💻 |📊 |💼 |🤝 |⭐ |📚 /g, '')
+      .replace(/ /g, ''); // Remove spaces after removing icons
+
+    // Normalize incoming message for matching
+    const normalizedMessage = lowerMessage
+      .replace(/🌟 |🏢 |📞 |💰 |🎯 |💻 |📊 |💼 |🤝 |⭐ |📚 /g, '')
+      .replace(/ /g, '');
+
+    if (normalizedMessage.includes(normalizedOptionText)) {
+      return { text: option.response, options: option.options };
+    }
+  }
+
+  // Check for direct service title matches (e.g., "web development" should return Web Development service details)
   for (const serviceTitle of Object.keys(serviceResponses)) {
     if (lowerMessage.includes(serviceTitle.toLowerCase())) {
-      return serviceResponses[serviceTitle];
+      const relatedQuickOption = quickOptions.find(opt => opt.category === 'services'); // Get options from main services quick option
+      return { text: serviceResponses[serviceTitle], options: relatedQuickOption?.options };
     }
   }
 
