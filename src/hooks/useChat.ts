@@ -3,14 +3,23 @@
 import { useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Message } from '../types/chat';
-import { quickOptions, getResponseByKeyword } from '../data/chatResponses'; // Import predefined responses
+// Import all necessary data and response helpers
+import { quickOptions, getResponseByKeyword, serviceResponses } from '../data/chatResponses';
+import { serviceCategories } from '../data/service'; // To list service names in initial message options
+import { contactInfo } from '../data/contact';
+import { socialLinks } from '../data/social';
+import { testimonials } from '../data/testimonials';
+import { jobPositions } from '../data/careers';
+import { projects } from '../data/projects';
+import { services } from '../data/services'; // Ensure detailed services are imported for context
+
 
 // Define a static welcome message for the UI.
 // This message is displayed immediately without making an API call.
 const initialMessages: Message[] = [
   {
     id: uuidv4(), // Generate a unique ID for the welcome message
-    text: "Hello! I'm AspenCask's AI Assistant. How can I help you today?",
+    text: "Hello! I'm AspenCask Solution LLP's AI Assistant. How can I help you today? Feel free to ask about our services, company, or get a quote! 🌟",
     isBot: true,
     timestamp: new Date(),
     options: quickOptions.map(opt => opt.text), // Use the main quick options from chatResponses
@@ -20,10 +29,56 @@ const initialMessages: Message[] = [
 // Define key information about AspenCask to guide the AI's responses for general queries.
 // This context is prepended only when falling back to the Gemini API.
 const ASPENCASK_CONTEXT = `
-You are an AI assistant for AspenCask. AspenCask is a company dedicated to providing innovative and high-quality solutions in the technology sector, including web development, mobile development, AI/ML, cloud computing, enterprise software, data analytics, cybersecurity, blockchain/Web3, and technology consulting.
+You are an AI assistant for AspenCask Solution LLP. AspenCask is a rapidly growing software development company founded in 2024, specializing in cutting-edge technology solutions across 9 major categories.
+
 Our mission is to transform businesses through innovative digital solutions.
-Our core values include client-centricity, innovation, integrity, and excellence.
-When responding, keep AspenCask's focus and offerings in mind.
+We have delivered **${projects.length}+ successful projects** and maintained a **99.9% client satisfaction rate**.
+We have served **50+ enterprise clients globally across 15+ countries**.
+Our core values include innovation-driven solutions, a client-centric approach, quality & reliability first, transparent communication, continuous improvement, and sustainable technology practices.
+
+AspenCask offers a comprehensive suite of services with a proven 6-phase development methodology: Discovery & Strategy, Planning & Architecture, Design & Prototyping, Development & Integration, Testing & Quality Assurance, and Deployment & Launch. We provide **6 months of free post-launch support**.
+
+Our expertise includes a team of **50+ expert developers, designers, and consultants**, utilizing the latest technology stack, ISO 9001:2015 certified processes, and SOC 2 Type II compliance.
+
+**Detailed Company Information for Direct Retrieval:**
+
+**1. Services Offered:**
+${services.map(s => `**${s.title}**: ${s.description}\n   Features: ${s.features.join(', ')}`).join('\n\n')}
+
+**2. Contact Information:**
+* **Phone**: ${contactInfo.phone}
+* **Email**: ${contactInfo.email}
+* **Website**: www.aspencask.com (Note: please replace with actual website if different)
+* **Office Address**: ${contactInfo.office.address}, ${contactInfo.office.city}, ${contactInfo.office.state} - ${contactInfo.office.pincode}
+* **Business Hours (IST)**: ${contactInfo.businessHours}
+* **Support Hours (IST)**: ${contactInfo.supportHours} (24/7 Emergency Support Available)
+
+**3. Social Media Presence:**
+${socialLinks.map(link => `* **${link.name}**: ${link.url}`).join('\n')}
+
+**4. Key Projects (Portfolio Highlights):**
+${projects.map(p => `* **${p.title}** (Category: ${p.category}): ${p.description} | Technologies: ${p.technologies.join(', ')}`).join('\n')}
+
+**5. Client Testimonials:**
+${testimonials.map(t => `* "${t.content}" - ${t.name}, ${t.position} at ${t.company} (Rating: ${t.rating} out of 5 stars)`).join('\n')}
+
+**6. Career Opportunities (Job Positions & Work Culture):**
+* **Current Openings**: ${jobPositions.length > 0 ? jobPositions.map(job => `${job.title} (${job.type}, ${job.location}) - Experience: ${job.experience}`).join('; ') : 'No open positions currently.'}
+* **Work Culture Highlights**: ${workCulture.map(culture => `${culture.title}: ${culture.description}`).join('; ')}
+    * **Benefits**: Competitive salary, health and wellness, flexible working hours, professional development, collaborative environment, exposure to cutting-edge technologies.
+
+**7. Achievements & Statistics:**
+* **Projects Delivered**: 50+
+* **Client Satisfaction Rate**: 99.9%
+* **Enterprise Clients Served**: 50+
+* **Global Presence**: 15+ countries
+* **Average Client Rating**: 4.9/5
+* **Client Value Generated**: $50M+
+* **Team Size**: 50+ expert developers, designers & consultants
+* **Project Success Rate**: 100% on-time delivery
+* **Client Retention**: 95% long-term partnerships
+
+When responding, always prioritize providing accurate information directly from this context. If a user asks a specific question that can be answered with a direct data point (e.g., "What is your phone number?", "Tell me about the Edunova Skill project?", "What are your business hours?", "Who gave you a testimonial?"), extract that specific detail. If the query is general or requires synthesis, use this context to inform your generated response. Maintain a professional, helpful, and informative tone. Guide the user towards AspenCask's services and value propositions. Avoid making up information.
 `;
 
 interface ChatHook {
@@ -62,7 +117,6 @@ export const useChat = (): ChatHook => {
       text: text,
       isBot: true, // Mark as a bot message
       timestamp: new Date(), // Current timestamp
-      // Example: Add quick options if the bot's response contains a specific phrase
       options: options || [],
     };
     setMessages(prevMessages => [...prevMessages, newBotMessage]);
@@ -74,9 +128,10 @@ export const useChat = (): ChatHook => {
     try {
       let promptToSend = prompt;
 
-      // For the first actual user message (when chatHistory is empty),
+      // For the first actual user message (when chatHistory is empty or contains only the initial bot message),
       // prepend the Aspencask context to guide the AI.
-      if (history.length === 0) {
+      // We check history.length <= 1 because initialMessages already contains one bot message.
+      if (history.length === 0 || (history.length === 1 && history[0].role === 'model')) {
         promptToSend = `${ASPENCASK_CONTEXT}\n\nUser query: ${prompt}`;
       }
 
@@ -139,17 +194,33 @@ export const useChat = (): ChatHook => {
     setInputValue(''); // Clear the input field
 
     // --- Check for predefined responses first ---
-    const staticResponse = getResponseByKeyword(userMessageText);
+    const staticResponse = getResponseByKeyword(userMessageText); // Use getResponseByKeyword for user input
 
     if (staticResponse) {
       // If a static response is found, use it directly
-      addBotMessage(staticResponse);
+      let optionsToSend: string[] = [];
+      
+      // Try to find matching options from quickOptions or serviceCategories
+      const quickOptionMatch = quickOptions.find(opt => opt.response === staticResponse);
+      if (quickOptionMatch) {
+        optionsToSend = quickOptionMatch.options || [];
+      } else {
+        // If it's a service response, try to find the category to get related options
+        const serviceCategoryMatch = serviceCategories.find(cat => serviceResponses[cat.name] === staticResponse);
+        if (serviceCategoryMatch) {
+          optionsToSend = serviceCategories.map(cat => cat.name).concat(["💰 Get Quote", "📞 Contact Us", "📊 Case Studies"]);
+        }
+      }
+
+      addBotMessage(staticResponse, optionsToSend); // Provide static response and relevant options
+
       // Optionally, update chatHistory with this exchange if you want Gemini to be aware of it
-      // setChatHistory(prevHistory => [
-      //   ...prevHistory,
-      //   { role: 'user', parts: [{ text: userMessageText }] },
-      //   { role: 'model', parts: [{ text: staticResponse }] },
-      // ]);
+      setChatHistory(prevHistory => [
+         ...prevHistory,
+         { role: 'user', parts: [{ text: userMessageText }] },
+         { role: 'model', parts: [{ text: staticResponse }] },
+      ]);
+
     } else {
       // If no static response, call the Gemini API
       callGeminiAPI(userMessageText, chatHistory);
@@ -168,20 +239,33 @@ export const useChat = (): ChatHook => {
     setMessages(prevMessages => [...prevMessages, newUserMessage]);
 
     // Find the corresponding quick option object
-    const selectedOption = quickOptions.find(opt => opt.text === option);
+    const selectedQuickOption = quickOptions.find(opt => opt.text === option);
+    
+    // Check if the option is a direct service name from serviceResponses
+    const serviceDetailResponse = serviceResponses[option];
 
-    if (selectedOption && selectedOption.response) {
-      // Use the predefined response
-      addBotMessage(selectedOption.response, selectedOption.options);
-      // Optionally, update chatHistory with this exchange if you want Gemini to be aware of it
-      // setChatHistory(prevHistory => [
-      //   ...prevHistory,
-      //   { role: 'user', parts: [{ text: option }] },
-      //   { role: 'model', parts: [{ text: selectedOption.response }] },
-      // ]);
+    if (serviceDetailResponse) {
+      // If it's a service detail, provide that response and associated options from quickOptions
+      const relatedQuickOption = quickOptions.find(opt => opt.category === 'services'); // Find the main services option to get its sub-options
+      addBotMessage(serviceDetailResponse, relatedQuickOption?.options);
+      // Add to chat history
+      setChatHistory(prevHistory => [
+        ...prevHistory,
+        { role: 'user', parts: [{ text: option }] },
+        { role: 'model', parts: [{ text: serviceDetailResponse }] },
+      ]);
+    } else if (selectedQuickOption && selectedQuickOption.response) {
+      // If it's a main quick option, provide its defined response and options
+      addBotMessage(selectedQuickOption.response, selectedQuickOption.options);
+      // Add to chat history
+      setChatHistory(prevHistory => [
+        ...prevHistory,
+        { role: 'user', parts: [{ text: option }] },
+        { role: 'model', parts: [{ text: selectedQuickOption.response }] },
+      ]);
     } else {
       // If no predefined response or options, or if it's a dynamic option not covered by static responses,
-      // fall back to Gemini API (e.g., "Yes", "No" from previous example)
+      // fall back to Gemini API (e.g., "Yes", "No" from previous example or general questions after a detailed response)
       callGeminiAPI(option, chatHistory);
     }
   }, [callGeminiAPI, chatHistory, addBotMessage]);
