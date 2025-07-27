@@ -39,7 +39,10 @@ interface ChatHook {
   exportChatHistory: () => void;
 }
 
-const API_ENDPOINT = '/api/chat-with-gemini'; // Your secure backend endpoint
+// Update the API_ENDPOINT to point to your Netlify Function.
+// When deployed, this will resolve to your_site_url/.netlify/functions/chat-with-gemini.
+// For local development with Netlify Dev, it will typically be http://localhost:8888/.netlify/functions/chat-with-gemini.
+const API_ENDPOINT = '/.netlify/functions/chat-with-gemini'; 
 
 export const useChat = (): ChatHook => {
   // Initialize messages with the static welcome message.
@@ -55,10 +58,11 @@ export const useChat = (): ChatHook => {
   // Function to add a bot message to the chat display
   const addBotMessage = useCallback((text: string, options?: string[]) => {
     const newBotMessage: Message = {
-      id: uuidv4(),
+      id: uuidv4(), // Unique ID for this message
       text: text,
-      isBot: true,
-      timestamp: new Date(),
+      isBot: true, // Mark as a bot message
+      timestamp: new Date(), // Current timestamp
+      // Example: Add quick options if the bot's response contains a specific phrase
       options: options || [],
     };
     setMessages(prevMessages => [...prevMessages, newBotMessage]);
