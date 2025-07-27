@@ -1,275 +1,226 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Message } from '../types/chat';
-import { quickOptions, serviceResponses, getResponseByKeyword } from '../data/chatResponses';
+// src/hooks/useChat.ts
 
-export const useChat = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+import { useState, useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { Message } from '../types/chat';
+import { quickOptions, getResponseByKeyword } from '../data/chatResponses'; // Import predefined responses
+
+// Define a static welcome message for the UI.
+// This message is displayed immediately without making an API call.
+const initialMessages: Message[] = [
+  {
+    id: uuidv4(), // Generate a unique ID for the welcome message
+    text: "Hello! I'm AspenCask's AI Assistant. How can I help you today?",
+    isBot: true,
+    timestamp: new Date(),
+    options: quickOptions.map(opt => opt.text), // Use the main quick options from chatResponses
+  },
+];
+
+// Define key information about AspenCask to guide the AI's responses for general queries.
+// This context is prepended only when falling back to the Gemini API.
+const ASPENCASK_CONTEXT = `
+You are an AI assistant for AspenCask. AspenCask is a company dedicated to providing innovative and high-quality solutions in the technology sector, including web development, mobile development, AI/ML, cloud computing, enterprise software, data analytics, cybersecurity, blockchain/Web3, and technology consulting.
+Our mission is to transform businesses through innovative digital solutions.
+Our core values include client-centricity, innovation, integrity, and excellence.
+When responding, keep AspenCask's focus and offerings in mind.
+`;
+
+interface ChatHook {
+  messages: Message[];
+  inputValue: string;
+  setInputValue: (value: string) => void;
+  isTyping: boolean;
+  messageCount: number;
+  handleQuickOption: (option: string) => void;
+  handleSendMessage: () => void;
+  handleFileUpload: (file: File) => void;
+  handleVoiceRecord: (audioBlob: Blob) => void;
+  exportChatHistory: () => void;
+}
+
+const API_ENDPOINT = '/api/chat-with-gemini'; // Your secure backend endpoint
+
+export const useChat = (): ChatHook => {
+  // Initialize messages with the static welcome message.
+  // This prevents an immediate API call on component mount.
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [sessionId] = useState(() => `session_${Date.now()}`);
-  const [messageCount, setMessageCount] = useState(0);
+  
+  // chatHistory will store the conversation in the format expected by Gemini.
+  // It starts as an empty array, as the first entry in Gemini's history must be 'user'.
+  const [chatHistory, setChatHistory] = useState<any[]>([]); 
 
-  // Initialize chat with welcome message
-  useEffect(() => {
-    if (messages.length === 0) {
-      const welcomeMessage: Message = {
-        id: 'welcome_1',
-        text: `🌟 Welcome to AspenCask Solution LLP! 
-
-I'm your AI assistant, ready to help you discover how our cutting-edge technology solutions can transform your business.
-
-What we excel at:
-🌐 Web Development - Custom websites & web applications
-📱 Mobile Development - iOS, Android & cross-platform apps  
-🤖 AI & Machine Learning - Intelligent automation & analytics
-☁️ Cloud Computing - Scalable infrastructure & migration
-🏢 Enterprise Software - ERP, CRM & business automation
-📊 Data Analytics & BI - Insights & business intelligence
-🔒 Cybersecurity - Comprehensive security solutions
-⛓️ Blockchain & Web3 - DeFi, NFTs & smart contracts
-💡 Technology Consulting - Strategy & digital transformation
-
-Quick Stats:
-✅ 50+ successful projects delivered
-✅ 100% client satisfaction rate
-✅ 24/7 support & maintenance
-✅ 6 months free post-launch support
-
-How can I help you today? 🚀`,
-        isBot: true,
-        timestamp: new Date(),
-        options: ["🌟 Our Services", "🏢 About Us", "📞 Contact Us", "💰 Get Quote", "📊 Case Studies"]
-      };
-      
-      setMessages([welcomeMessage]);
-    }
-  }, [messages.length]);
-
-  // Add message to chat
-  const addMessage = useCallback((text: string, isBot: boolean, options?: string[]) => {
-    const newMessage: Message = {
-      id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      text,
-      isBot,
+  // Function to add a bot message to the chat display
+  const addBotMessage = useCallback((text: string, options?: string[]) => {
+    const newBotMessage: Message = {
+      id: uuidv4(),
+      text: text,
+      isBot: true,
       timestamp: new Date(),
-      options,
-      sentiment: isBot ? 'neutral' : detectSentiment(text)
+      options: options || [],
     };
-    
-    setMessages(prev => [...prev, newMessage]);
-    setMessageCount(prev => prev + 1);
-    
-    // Save to localStorage for persistence
-    const savedMessages = JSON.parse(localStorage.getItem('aspencask_chat_history') || '[]');
-    savedMessages.push(newMessage);
-    if (savedMessages.length > 100) { // Keep only last 100 messages
-      savedMessages.splice(0, savedMessages.length - 100);
-    }
-    localStorage.setItem('aspencask_chat_history', JSON.stringify(savedMessages));
+    setMessages(prevMessages => [...prevMessages, newBotMessage]);
   }, []);
 
-  // Simple sentiment detection
-  const detectSentiment = (text: string): 'positive' | 'neutral' | 'negative' => {
-    const positiveWords = ['good', 'great', 'excellent', 'amazing', 'perfect', 'love', 'awesome', 'fantastic'];
-    const negativeWords = ['bad', 'terrible', 'awful', 'hate', 'disappointed', 'frustrated', 'poor'];
+  // A helper function to call your backend with the user's message
+  const callGeminiAPI = useCallback(async (prompt: string, history: any[]) => {
+    setIsTyping(true);
+    try {
+      let promptToSend = prompt;
+
+      // For the first actual user message (when chatHistory is empty),
+      // prepend the Aspencask context to guide the AI.
+      if (history.length === 0) {
+        promptToSend = `${ASPENCASK_CONTEXT}\n\nUser query: ${prompt}`;
+      }
+
+      // Make the API call to your backend, which then securely communicates with Gemini.
+      const response = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: promptToSend, // Send the modified prompt
+          history, // Send the current chat history for context
+        }),
+      });
+
+      if (!response.ok) {
+        // If the response is not OK, throw an error
+        const errorData = await response.json();
+        console.error('API Error Response:', errorData);
+        throw new Error(errorData.error || 'Failed to get response from Gemini API.');
+      }
+
+      const data = await response.json();
+      const botResponseText = data.text; // Assuming your backend returns a JSON with a 'text' field
+
+      addBotMessage(botResponseText); // Add the bot's response to the display
+
+      // Update the chat history context for the next turn.
+      // This is crucial for maintaining conversation flow with Gemini.
+      setChatHistory(prevHistory => [
+        ...prevHistory,
+        { role: 'user', parts: [{ text: prompt }] }, // Add user's original message to history
+        { role: 'model', parts: [{ text: botResponseText }] }, // Add bot's response to history
+      ]);
+
+    } catch (error) {
+      console.error('Error calling Gemini API:', error);
+      // Display a user-friendly error message in the chat
+      addBotMessage('Sorry, I am unable to process your request right now. Please try again later.');
+    } finally {
+      setIsTyping(false); // Stop typing indicator
+    }
+  }, [addBotMessage]);
+
+  const handleSendMessage = useCallback(() => {
+    if (!inputValue.trim()) return; // Don't send empty messages
+
+    const userMessageText = inputValue;
+
+    // Create a new message object for the user's input
+    const newUserMessage: Message = {
+      id: uuidv4(),
+      text: userMessageText,
+      isBot: false,
+      timestamp: new Date(),
+      options: [],
+    };
     
-    const lowerText = text.toLowerCase();
-    const positiveCount = positiveWords.filter(word => lowerText.includes(word)).length;
-    const negativeCount = negativeWords.filter(word => lowerText.includes(word)).length;
-    
-    if (positiveCount > negativeCount) return 'positive';
-    if (negativeCount > positiveCount) return 'negative';
-    return 'neutral';
+    setMessages(prevMessages => [...prevMessages, newUserMessage]); // Add user message to display
+    setInputValue(''); // Clear the input field
+
+    // --- Check for predefined responses first ---
+    const staticResponse = getResponseByKeyword(userMessageText);
+
+    if (staticResponse) {
+      // If a static response is found, use it directly
+      addBotMessage(staticResponse);
+      // Optionally, update chatHistory with this exchange if you want Gemini to be aware of it
+      // setChatHistory(prevHistory => [
+      //   ...prevHistory,
+      //   { role: 'user', parts: [{ text: userMessageText }] },
+      //   { role: 'model', parts: [{ text: staticResponse }] },
+      // ]);
+    } else {
+      // If no static response, call the Gemini API
+      callGeminiAPI(userMessageText, chatHistory);
+    }
+  }, [inputValue, callGeminiAPI, chatHistory, addBotMessage]);
+
+  const handleQuickOption = useCallback((option: string) => {
+    // Treat quick option clicks as user messages for display
+    const newUserMessage: Message = {
+      id: uuidv4(),
+      text: option,
+      isBot: false,
+      timestamp: new Date(),
+      options: [],
+    };
+    setMessages(prevMessages => [...prevMessages, newUserMessage]);
+
+    // Find the corresponding quick option object
+    const selectedOption = quickOptions.find(opt => opt.text === option);
+
+    if (selectedOption && selectedOption.response) {
+      // Use the predefined response
+      addBotMessage(selectedOption.response, selectedOption.options);
+      // Optionally, update chatHistory with this exchange if you want Gemini to be aware of it
+      // setChatHistory(prevHistory => [
+      //   ...prevHistory,
+      //   { role: 'user', parts: [{ text: option }] },
+      //   { role: 'model', parts: [{ text: selectedOption.response }] },
+      // ]);
+    } else {
+      // If no predefined response or options, or if it's a dynamic option not covered by static responses,
+      // fall back to Gemini API (e.g., "Yes", "No" from previous example)
+      callGeminiAPI(option, chatHistory);
+    }
+  }, [callGeminiAPI, chatHistory, addBotMessage]);
+
+  // Placeholder functions for future functionality
+  const handleFileUpload = (file: File) => {
+    console.log('File upload logic not implemented yet for:', file.name);
+    // Future implementation might involve sending files to a multimodal Gemini model
   };
 
-  // Simulate typing indicator
-  const simulateTyping = useCallback((duration: number = 1500) => {
-    setIsTyping(true);
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        setIsTyping(false);
-        resolve();
-      }, duration);
-    });
-  }, []);
+  const handleVoiceRecord = (audioBlob: Blob) => {
+    console.log('Voice record logic not implemented yet. Blob size:', audioBlob.size);
+    // Future implementation might involve speech-to-text conversion then sending text to Gemini
+  };
 
-  // Handle quick option selection
-  const handleQuickOption = useCallback(async (optionText: string) => {
-    addMessage(optionText, false);
-    
-    await simulateTyping(1200);
-    
-    // Handle special actions
-    if (optionText === "📅 Schedule Call") {
-      window.open(`tel:+919608674820`, '_blank');
-      addMessage(
-        "📞 Opening phone dialer for +91 9608674820...\n\nBusiness Hours (IST):\n🕒 Monday - Friday: 9:00 AM - 8:00 PM\n🕒 Saturday: 10:00 AM - 6:00 PM\n🕒 24/7 Emergency Support Available\n\nWhat to expect:\n✅ Immediate technical consultation\n✅ Project requirements discussion\n✅ Custom quote within 24 hours\n✅ Expert guidance from our team\n\nFeel free to call us now for immediate assistance! 📲", 
-        true, 
-        ["🌟 Our Services", "📧 Send Email", "💰 Get Quote"]
-      );
-      return;
-    }
+  const exportChatHistory = () => {
+    // Format messages into a readable text string
+    const chatText = messages.map(msg =>
+      `[${msg.timestamp.toLocaleString()}] ${msg.isBot ? 'Bot' : 'User'}: ${msg.text}`
+    ).join('\n');
 
-    if (optionText === "📧 Send Email" || optionText === "📧 Send Requirements") {
-      const subject = encodeURIComponent("Project Inquiry - AspenCask Solutions");
-      const body = encodeURIComponent(`Hi AspenCask Solution LLP team,
-
-I'm interested in learning more about your technology solutions and would like to discuss my project requirements.
-
-PROJECT DETAILS:
-• Type of solution needed: [Web/Mobile/AI/Cloud/Enterprise/Other]
-• Project timeline: [When do you need it completed?]
-• Budget range: [Your investment range]
-• Specific requirements: [Brief description of your needs]
-• Target audience: [Who will use this solution?]
-
-CONTACT PREFERENCES:
-• Best time to call: [Your preferred time]
-• Preferred communication method: [Email/Phone/Video call]
-
-Please contact me to schedule a detailed consultation.
-
-Thank you!
-
-Best regards,
-[Your Name]
-[Your Company]
-[Your Phone]`);
-      
-      window.open(`mailto:support@aspencask.com?subject=${subject}&body=${body}`, '_blank');
-      addMessage(
-        "📧 Opening email client for support@aspencask.com...\n\nEmail Response Time:\n⚡ Within 2 hours during business hours\n📋 Detailed project quotes within 24 hours\n🤝 Discovery call scheduled within same day\n\nWhat to include in your email:\n• Project type & specific requirements\n• Timeline & budget considerations  \n• Contact preferences & availability\n• Any technical questions or concerns\n\nOur Email Commitment:\n✅ Personalized response from technical expert\n✅ Detailed project breakdown & recommendations\n✅ Transparent pricing with no hidden costs\n✅ Free 30-minute consultation offer\n\nThis helps us provide you with the most relevant and valuable information! 💼", 
-        true, 
-        ["🌟 Our Services", "📞 Contact Us", "📅 Schedule Call"]
-      );
-      return;
-    }
-
-    // Handle service categories
-    if (serviceResponses[optionText]) {
-      addMessage(serviceResponses[optionText], true, ["📞 Contact Us", "💰 Get Quote", "🔄 Other Services", "📊 Case Studies"]);
-      return;
-    }
-
-    // Handle predefined options
-    const option = quickOptions.find(opt => opt.text === optionText);
-    if (option) {
-      addMessage(option.response, true, option.options);
-      return;
-    }
-
-    // Fallback response
-    addMessage(
-      "Thank you for your interest! 😊\n\nI'd be happy to provide more specific information about AspenCask Solution LLP. You can:\n\n• Choose from the quick options below for detailed information\n• Ask about specific services or technologies\n• Request a custom quote for your project\n• Schedule a consultation with our experts\n\nFor immediate assistance:\n📞 Phone: +91 9608674820\n📧 Email: support@aspencask.com\n\nAverage Response Time:\n• Chat: Instant\n• Phone: Immediate during business hours\n• Email: Within 2 hours\n\nHow can I help you further? 🚀", 
-      true, 
-      ["🌟 Our Services", "📞 Contact Us", "💰 Get Quote", "🏢 About Us"]
-    );
-  }, [addMessage, simulateTyping]);
-
-  // Handle user message
-  const handleSendMessage = useCallback(async () => {
-    if (!inputValue.trim()) return;
-
-    const userMessage = inputValue.trim();
-    addMessage(userMessage, false);
-    setInputValue('');
-
-    await simulateTyping(1500);
-
-    // Enhanced keyword matching
-    const lowerMessage = userMessage.toLowerCase();
-    
-    // Check for service-specific keywords
-    const keywordResponse = getResponseByKeyword(userMessage);
-    if (keywordResponse) {
-      addMessage(keywordResponse, true, ["📞 Contact Us", "💰 Get Quote", "🔄 Other Services"]);
-      return;
-    }
-
-    // Handle common queries
-    if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('budget')) {
-      handleQuickOption("💰 Get Quote");
-    } else if (lowerMessage.includes('contact') || lowerMessage.includes('phone') || lowerMessage.includes('call')) {
-      handleQuickOption("📞 Contact Us");
-    } else if (lowerMessage.includes('about') || lowerMessage.includes('company')) {
-      handleQuickOption("🏢 About Us");
-    } else if (lowerMessage.includes('service') || lowerMessage.includes('what do you do')) {
-      handleQuickOption("🌟 Our Services");
-    } else if (lowerMessage.includes('portfolio') || lowerMessage.includes('case study') || lowerMessage.includes('example')) {
-      handleQuickOption("📊 Case Studies");
-    } else {
-      // Intelligent contextual response
-      addMessage(
-        `Thank you for your message! 🙏\n\nI understand you're interested in "${userMessage}". Let me help you with that!\n\nHere's how I can assist you:\n\n🎯 Get Specific Information - Choose from the options below\n💬 Direct Consultation - Speak with our experts immediately\n📋 Custom Proposal - Get a tailored solution for your needs\n📊 See Our Work - Review case studies and success stories\n\nQuick Response Options:\n• For technical questions → Choose "Our Services"\n• For project discussion → Choose "Contact Us"  \n• For pricing information → Choose "Get Quote"\n• For company information → Choose "About Us"\n\nDirect Contact (Fastest Response):\n📞 Call Now: +91 9608674820\n📧 Email: support@aspencask.com\n\nWhat would you like to explore first? 🚀`, 
-        true, 
-        ["🌟 Our Services", "📞 Contact Us", "💰 Get Quote", "🏢 About Us", "📊 Case Studies"]
-      );
-    }
-  }, [inputValue, addMessage, simulateTyping, handleQuickOption]);
-
-  // Handle file upload
-  const handleFileUpload = useCallback(async (file: File) => {
-    addMessage(`📎 Uploaded file: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, false);
-    
-    await simulateTyping(1000);
-    
-    addMessage(
-      "📎 File received successfully!\n\nThank you for sharing the file. Our team will review it and provide detailed feedback.\n\nNext Steps:\n1️⃣ Our technical team will analyze your file\n2️⃣ We'll provide feedback within 24 hours\n3️⃣ Schedule a call to discuss recommendations\n\nFor faster review:\n📞 Call us directly at +91 9608674820\n📧 Email us at support@aspencask.com\n\nWould you like to schedule a call to discuss this in detail? 📞",
-      true,
-      ["📅 Schedule Call", "📧 Send Email", "💰 Get Quote"]
-    );
-  }, [addMessage, simulateTyping]);
-
-  // Handle voice recording
-  const handleVoiceRecord = useCallback(async (audioBlob: Blob) => {
-    addMessage("🎤 Voice message recorded", false);
-    
-    await simulateTyping(1000);
-    
-    addMessage(
-      "🎤 Voice message received!\n\nThank you for the voice message. While I can't process audio directly yet, our team can listen to it and respond appropriately.\n\nFor immediate voice consultation:\n📞 Call us directly: +91 9608674820\n⏰ Available: Mon-Fri 9 AM - 8 PM IST\n\nAlternatively:\n• Type your question for instant response\n• Schedule a video call for detailed discussion\n• Send an email with your requirements\n\nHow would you prefer to continue? 🤔",
-      true,
-      ["📅 Schedule Call", "💬 Type Question", "📧 Send Email"]
-    );
-  }, [addMessage, simulateTyping]);
-
-  // Export chat history
-  const exportChatHistory = useCallback(() => {
-    const chatData = {
-      sessionId,
-      timestamp: new Date().toISOString(),
-      messages: messages.map(msg => ({
-        text: msg.text,
-        isBot: msg.isBot,
-        timestamp: msg.timestamp.toISOString(),
-        options: msg.options
-      }))
-    };
-    
-    const dataStr = JSON.stringify(chatData, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
-    const exportFileDefaultName = `aspencask_chat_${new Date().toISOString().split('T')[0]}.json`;
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-  }, [sessionId, messages]);
+    // Create a Blob and a download link
+    const blob = new Blob([chatText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'chat-history.txt'; // Filename for download
+    document.body.appendChild(a); // Append to body to make it clickable
+    a.click(); // Programmatically click the link to trigger download
+    document.body.removeChild(a); // Clean up the link
+    URL.revokeObjectURL(url); // Release the object URL
+  };
 
   return {
     messages,
     inputValue,
     setInputValue,
     isTyping,
-    messageCount,
-    sessionId,
-    addMessage,
+    messageCount: messages.length, // Total number of messages
     handleQuickOption,
     handleSendMessage,
     handleFileUpload,
     handleVoiceRecord,
     exportChatHistory,
-    simulateTyping
   };
 };

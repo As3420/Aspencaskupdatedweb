@@ -157,14 +157,6 @@ const ChatBot: React.FC = () => {
           </>
         )}
       </button>
-
-      {/* Floating tooltip */}
-      {/* {!isOpen && (
-        <div className="absolute bottom-20 right-0 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap shadow-lg">
-          💬 Chat with AspenCask AI
-          <div className="absolute top-full right-4 w-2 h-2 bg-gray-900 transform rotate-45"></div>
-        </div>
-      )} */}
     </div>
   );
 };
