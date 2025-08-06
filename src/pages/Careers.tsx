@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { AnimatedText } from '../components/ui/AnimatedText';
@@ -17,6 +17,10 @@ import {
   Mail,
   Target,
   Zap,
+  X,
+  CheckCircle2,
+  AlertTriangle,
+  Loader2,
 } from 'lucide-react';
 import * as Icons from 'lucide-react';
 
@@ -73,6 +77,49 @@ const workCulture: WorkCulture[] = [
   { icon: 'Smile', title: 'Inclusive Community', description: 'A welcoming and diverse workplace where everyone feels valued.' },
 ];
 
+// ====================== Snackbar ======================
+type SnackbarType = 'success' | 'error';
+interface SnackbarState {
+  open: boolean;
+  type: SnackbarType;
+  message: string;
+}
+
+const Snackbar: React.FC<{ state: SnackbarState; onClose: () => void }> = ({ state, onClose }) => {
+  return (
+    <AnimatePresence>
+      {state.open && (
+        <motion.div
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-4 sm:px-0"
+          initial={{ y: 80, opacity: 0, scale: 0.98 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          exit={{ y: 80, opacity: 0, scale: 0.98 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+        >
+          <div
+            className={`flex items-start sm:items-center gap-3 sm:gap-4 rounded-2xl shadow-lg p-4 sm:p-5 w-[92vw] sm:w-auto max-w-[640px]
+            ${state.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}
+          >
+            <div className="flex-shrink-0">
+              {state.type === 'success' ? <CheckCircle2 className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
+            </div>
+            <div className="text-sm sm:text-base leading-relaxed">
+              {state.message}
+            </div>
+            <button
+              aria-label="Close"
+              onClick={onClose}
+              className="ml-auto rounded-full hover:bg-white/10 p-1"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
 // ====================== Component ======================
 export const Careers: React.FC = () => {
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
@@ -81,6 +128,12 @@ export const Careers: React.FC = () => {
   const [jobPositions, setJobPositions] = useState<JobPosition[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(true);
   const [jobFetchError, setJobFetchError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false); // global submit lock
+  const [snackbar, setSnackbar] = useState<SnackbarState>({
+    open: false,
+    type: 'success',
+    message: '',
+  });
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<CareerApplication>();
 
@@ -106,7 +159,18 @@ export const Careers: React.FC = () => {
     fetchJobPositions();
   }, []);
 
+  // Snackbar helpers
+  const showSnack = useCallback((type: SnackbarType, message: string) => {
+    setSnackbar({ open: true, type, message });
+    // Auto-hide after 3.5s
+    const t = setTimeout(() => setSnackbar(s => ({ ...s, open: false })), 3500);
+    return () => clearTimeout(t);
+  }, []);
+  const closeSnack = useCallback(() => setSnackbar(s => ({ ...s, open: false })), []);
+
   const onSubmit = async (form: CareerApplication) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       const response = await fetch('/.netlify/functions/apply', {
         method: 'POST',
@@ -115,16 +179,19 @@ export const Careers: React.FC = () => {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result?.error || 'Unknown error');
-      alert("Thank you for your application! We'll review it and get back to you soon.");
+      showSnack('success', "Thank you! Your application has been submitted.");
       reset();
       setShowApplication(false);
     } catch (err: any) {
       console.error('Application submission error:', err);
-      alert(`Failed to submit application: ${err?.message || 'Unknown error'}`);
+      showSnack('error', `Failed to submit application: ${err?.message || 'Unknown error'}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleApply = (jobTitle: string) => {
+    if (isSubmitting) return; // guard while submitting
     setApplicationPosition(jobTitle);
     setShowApplication(true);
   };
@@ -216,12 +283,23 @@ export const Careers: React.FC = () => {
                         <div className="flex gap-3 mt-4 lg:mt-0">
                           <Button
                             variant="outline"
+                            disabled={isSubmitting}
                             onClick={() => setSelectedJob(selectedJob === job.id ? null : job.id)}
                             icon={selectedJob === job.id ? ChevronUp : ChevronDown}
                           >
                             Details
                           </Button>
-                          <Button onClick={() => handleApply(job.title)}>Apply Now</Button>
+                          <Button
+                            disabled={isSubmitting}
+                            onClick={() => handleApply(job.title)}
+                          >
+                            {isSubmitting ? (
+                              <span className="inline-flex gap-2 items-center">
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Please wait…
+                              </span>
+                            ) : 'Apply Now'}
+                          </Button>
                         </div>
                       </div>
 
@@ -371,16 +449,18 @@ export const Careers: React.FC = () => {
                     viewport={{ once: true }}
                   >
                     <Button
-                      onClick={() => {
-                        setApplicationPosition('General Application');
-                        setShowApplication(true);
-                      }}
+                      disabled={isSubmitting}
+                      onClick={() => handleApply('General Application')}
                       className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8"
                       icon={Mail}
                     >
-                      Send Your Resume
+                      {isSubmitting ? (
+                        <span className="inline-flex gap-2 items-center">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Please wait…
+                        </span>
+                      ) : 'Send Your Resume'}
                     </Button>
-                    {/* <Button variant="outline" onClick={() => window.open('mailto:careers@company.com?subject=Career Interest', '_blank')} icon={Calendar}>Subscribe to Updates</Button> */}
                   </motion.div>
 
                   <motion.p className="text-sm text-gray-500 mt-6" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.7 }} viewport={{ once: true }}>
@@ -481,7 +561,7 @@ export const Careers: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setShowApplication(false)}
+            onClick={() => !isSubmitting && setShowApplication(false)}
           >
             <motion.div
               className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
@@ -490,10 +570,15 @@ export const Careers: React.FC = () => {
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-8">
+              <div className="p-6 sm:p-8">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-3xl font-bold text-gray-900">Apply for Position</h2>
-                  <button onClick={() => setShowApplication(false)} className="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Apply for Position</h2>
+                  <button
+                    onClick={() => !isSubmitting && setShowApplication(false)}
+                    className={`text-gray-400 hover:text-gray-600 text-2xl ${isSubmitting ? 'pointer-events-none opacity-50' : ''}`}
+                  >
+                    ×
+                  </button>
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -505,6 +590,7 @@ export const Careers: React.FC = () => {
                         {...register('name', { required: 'Name is required' })}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Your full name"
+                        disabled={isSubmitting}
                       />
                       {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
                     </div>
@@ -519,6 +605,7 @@ export const Careers: React.FC = () => {
                         })}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="your@email.com"
+                        disabled={isSubmitting}
                       />
                       {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
                     </div>
@@ -532,6 +619,7 @@ export const Careers: React.FC = () => {
                         {...register('phone', { required: 'Phone number is required' })}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="+91 9876543210"
+                        disabled={isSubmitting}
                       />
                       {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>}
                     </div>
@@ -545,6 +633,7 @@ export const Careers: React.FC = () => {
                         onChange={(e) => setApplicationPosition(e.target.value)}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Position applying for"
+                        disabled={isSubmitting}
                       />
                       {errors.position && <p className="mt-1 text-sm text-red-600">{errors.position.message}</p>}
                     </div>
@@ -556,6 +645,7 @@ export const Careers: React.FC = () => {
                       <select
                         {...register('experience', { required: 'Experience is required' })}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        disabled={isSubmitting}
                       >
                         <option value="">Select experience</option>
                         <option value="0-1">0-1 years</option>
@@ -574,6 +664,7 @@ export const Careers: React.FC = () => {
                         {...register('portfolio')}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="https://your-portfolio.com"
+                        disabled={isSubmitting}
                       />
                     </div>
                   </div>
@@ -585,16 +676,28 @@ export const Careers: React.FC = () => {
                       {...register('coverLetter', { required: 'Cover letter is required' })}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                       placeholder="Tell us why you're interested in this position and what makes you a great fit..."
+                      disabled={isSubmitting}
                     />
                     {errors.coverLetter && <p className="mt-1 text-sm text-red-600">{errors.coverLetter.message}</p>}
                   </div>
 
-                  <div className="flex gap-4">
-                    <Button type="button" variant="outline" onClick={() => setShowApplication(false)} className="flex-1">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowApplication(false)}
+                      className="flex-1"
+                      disabled={isSubmitting}
+                    >
                       Cancel
                     </Button>
-                    <Button type="submit" icon={Send} className="flex-1">
-                      Submit Application
+                    <Button type="submit" className="flex-1" disabled={isSubmitting} icon={Send}>
+                      {isSubmitting ? (
+                        <span className="inline-flex gap-2 items-center">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Submitting…
+                        </span>
+                      ) : 'Submit Application'}
                     </Button>
                   </div>
                 </form>
@@ -605,33 +708,41 @@ export const Careers: React.FC = () => {
       </AnimatePresence>
 
       {/* ================= CTA ================= */}
-<section className="py-20 bg-gradient-to-r from-slate-900 to-blue-900 text-white">
-  <div className="container mx-auto px-6 text-center">
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      viewport={{ once: true }}
-    >
-      <AnimatedText
-        text="Don't See Your Role?"
-        className="text-4xl md:text-5xl font-bold mb-6"
-      />
-      <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-        We're always looking for talented individuals. Send us your resume and we'll keep you in mind for future opportunities.
-      </p>
+      <section className="py-20 bg-gradient-to-r from-slate-900 to-blue-900 text-white">
+        <div className="container mx-auto px-6 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <AnimatedText
+              text="Don't See Your Role?"
+              className="text-4xl md:text-5xl font-bold mb-6"
+            />
+            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+              We're always looking for talented individuals. Send us your resume and we'll keep you in mind for future opportunities.
+            </p>
 
-      <Button
-        size="lg"
-        onClick={() => handleApply('General Application')}
-        className="bg-white text-slate-900 hover:bg-gray-100"
-      >
-        Send Your Resume
-      </Button>
-    </motion.div>
-  </div>
-</section>
+            <Button
+              size="lg"
+              onClick={() => handleApply('General Application')}
+              className="bg-white text-slate-900 hover:bg-gray-100"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <span className="inline-flex gap-2 items-center">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Please wait…
+                </span>
+              ) : 'Send Your Resume'}
+            </Button>
+          </motion.div>
+        </div>
+      </section>
 
+      {/* Snackbar */}
+      <Snackbar state={snackbar} onClose={closeSnack} />
     </div>
   );
 };
