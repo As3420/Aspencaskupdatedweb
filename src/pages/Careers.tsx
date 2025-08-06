@@ -90,28 +90,47 @@ const Snackbar: React.FC<{ state: SnackbarState; onClose: () => void }> = ({ sta
     <AnimatePresence>
       {state.open && (
         <motion.div
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-4 sm:px-0"
-          initial={{ y: 80, opacity: 0, scale: 0.98 }}
-          animate={{ y: 0, opacity: 1, scale: 1 }}
-          exit={{ y: 80, opacity: 0, scale: 0.98 }}
-          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+          // Mobile-first full-width card with safe-area padding
+          className="fixed z-[100] left-0 right-0 bottom-3 sm:bottom-6 px-3 sm:px-0 pb-[env(safe-area-inset-bottom)]"
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 40, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 24 }}
         >
           <div
-            className={`flex items-start sm:items-center gap-3 sm:gap-4 rounded-2xl shadow-lg p-4 sm:p-5 w-[92vw] sm:w-auto max-w-[640px]
-            ${state.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}
+            className={[
+              // Container
+              'mx-auto w-full sm:w-auto sm:max-w-[640px]',
+              // Card look
+              'rounded-xl sm:rounded-2xl shadow-lg',
+              'p-4 sm:p-5',
+              // Colors
+              state.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white',
+              // Layout
+              'flex items-start sm:items-center gap-3 sm:gap-4',
+            ].join(' ')}
+            role="status"
+            aria-live="polite"
           >
             <div className="flex-shrink-0">
-              {state.type === 'success' ? <CheckCircle2 className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
+              {state.type === 'success' ? (
+                <CheckCircle2 className="w-6 h-6" aria-hidden="true" />
+              ) : (
+                <AlertTriangle className="w-6 h-6" aria-hidden="true" />
+              )}
             </div>
-            <div className="text-sm sm:text-base leading-relaxed">
+
+            {/* Text wraps nicely on mobile */}
+            <div className="text-sm sm:text-base leading-relaxed break-words">
               {state.message}
             </div>
+
             <button
-              aria-label="Close"
+              aria-label="Close notification"
               onClick={onClose}
-              className="ml-auto rounded-full hover:bg-white/10 p-1"
+              className="ml-auto rounded-full p-1 hover:bg-white/10 transition"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
         </motion.div>
@@ -179,7 +198,7 @@ export const Careers: React.FC = () => {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result?.error || 'Unknown error');
-      showSnack('success', "Thank you! Your application has been submitted.");
+      showSnack('success', 'Thank you! Your application has been submitted.');
       reset();
       setShowApplication(false);
     } catch (err: any) {
@@ -228,7 +247,7 @@ export const Careers: React.FC = () => {
         </div>
       </section>
 
-      {/* ============ Open Positions (moved here) ============ */}
+      {/* ============ Open Positions (below hero) ============ */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
           <motion.div
