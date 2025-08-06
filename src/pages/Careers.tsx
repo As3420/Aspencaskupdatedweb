@@ -605,24 +605,33 @@ export const Careers: React.FC = () => {
       </AnimatePresence>
 
       {/* ================= CTA ================= */}
-      <section className="py-20 bg-gradient-to-r from-slate-900 to-blue-900 text-white">
-        <div className="container mx-auto px-6 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} viewport={{ once: true }}>
-            <AnimatedText text="Don't See Your Role?" className="text-4xl md:text-5xl font-bold mb-6" />
-            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              We're always looking for talented individuals. Send us your resume and we'll keep you in mind for future opportunities.
-            </p>
-            {/* Optional general application button */}
-            {/* <Button
-              size="lg"
-              onClick={() => { setApplicationPosition('General Application'); setShowApplication(true); }}
-              className="bg-white text-slate-900 hover:bg-gray-100"
-            >
-              Send General Application
-            </Button> */}
-          </motion.div>
-        </div>
-      </section>
+<section className="py-20 bg-gradient-to-r from-slate-900 to-blue-900 text-white">
+  <div className="container mx-auto px-6 text-center">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      viewport={{ once: true }}
+    >
+      <AnimatedText
+        text="Don't See Your Role?"
+        className="text-4xl md:text-5xl font-bold mb-6"
+      />
+      <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+        We're always looking for talented individuals. Send us your resume and we'll keep you in mind for future opportunities.
+      </p>
+
+      <Button
+        size="lg"
+        onClick={() => handleApply('General Application')}
+        className="bg-white text-slate-900 hover:bg-gray-100"
+      >
+        Send Your Resume
+      </Button>
+    </motion.div>
+  </div>
+</section>
+
     </div>
   );
 };
